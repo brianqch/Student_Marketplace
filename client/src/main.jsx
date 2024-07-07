@@ -6,8 +6,10 @@ import {
 } from "react-router-dom";
 import App from "./App";
 import Record from "./components/Record";
+import ItemList from "./components/ItemList";
 import RecordList from "./components/RecordList";
 import "./index.css";
+import NewItem from "./components/NewItem";
 
 const router = createBrowserRouter([
   {
@@ -16,7 +18,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <RecordList />,
+        element: <ItemList />,
       },
     ],
   },
@@ -37,6 +39,16 @@ const router = createBrowserRouter([
       {
         path: "/create",
         element: <Record />,
+      },
+    ],
+  },
+  {
+    path: "/createNewItem",
+    element: <App />,
+    children: [
+      {
+        path: "/createNewItem",
+        element: <NewItem />,
       },
     ],
   },
