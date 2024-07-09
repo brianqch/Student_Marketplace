@@ -5,6 +5,7 @@ export default function NewItem() {
     const [form, setForm] = useState({
         item_title: "",
         item_price: "",
+        item_location: "",
         item_category: "",
         item_condition: "",
         item_description: ""
@@ -83,6 +84,7 @@ export default function NewItem() {
             setForm({
                 item_title: "",
                 item_price: "",
+                item_location: "",
                 item_category: "",
                 item_condition: "",
                 item_description: ""
@@ -148,6 +150,27 @@ export default function NewItem() {
                                         placeholder="Price"
                                         value={form.item_price}
                                         onChange={(e) => updateForm({ item_price: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="sm:col-span-4">
+                            <label
+                                htmlFor="item_location"
+                                className="block text-sm font-medium leading-6 text-slate-900"
+                            >
+                                Location
+                            </label>
+                            <div className="mt-2">
+                                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                                    <input
+                                        type="text"
+                                        name="item_location"
+                                        id="item_location"
+                                        className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6"
+                                        placeholder="Location"
+                                        value={form.item_location}
+                                        onChange={(e) => updateForm({ item_location: e.target.value })}
                                     />
                                 </div>
                             </div>

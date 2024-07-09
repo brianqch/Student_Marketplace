@@ -34,6 +34,7 @@ router.post("/", async (req, res) => {
     let newDocument = {
       item_title: req.body.item_title,
       item_price: req.body.item_price,
+      item_location: req.body.item_location,
       item_category: req.body.item_category,
       item_condition: req.body.item_condition,
       item_description: req.body.item_description
@@ -56,6 +57,7 @@ router.patch("/:id", async (req, res) => {
       $set: {
         item_title: req.body.item_title,
         item_price: req.body.item_price,
+        item_location: req.body.item_location,
         item_category: req.body.item_category,
         item_condition: req.body.item_condition,
         item_description: req.body.item_description

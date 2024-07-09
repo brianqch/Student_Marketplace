@@ -28,7 +28,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/edit/:id",
-        element: <Record />,
+        element: <NewItem />,
       },
     ],
   },

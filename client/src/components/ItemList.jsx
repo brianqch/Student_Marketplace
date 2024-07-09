@@ -10,6 +10,9 @@ const Item = (props) => (
       {props.item.item_price}
     </td>
     <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
+      {props.item.item_location}
+    </td>
+    <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
       {props.item.item_category}
     </td>
     <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
@@ -96,6 +99,9 @@ export default function ItemList() {
                 </th>
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
                   Price
+                </th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
+                  Location
                 </th>
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
                   Category
