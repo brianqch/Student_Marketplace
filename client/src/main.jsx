@@ -10,6 +10,8 @@ import ItemList from "./components/ItemList";
 import RecordList from "./components/RecordList";
 import "./index.css";
 import NewItem from "./components/NewItem";
+import Dev from "./components/Dev"
+import ItemExpanded from "./components/ItemExpanded";
 
 const router = createBrowserRouter([
   {
@@ -49,6 +51,26 @@ const router = createBrowserRouter([
       {
         path: "/createNewItem",
         element: <NewItem />,
+      },
+    ],
+  },
+  {
+    path: "/dev",
+    element: <App />,
+    children: [
+      {
+        path: "/dev",
+        element: <Dev />,
+      },
+    ],
+  },
+  {
+    path: "/itemExpanded",
+    element: <App />,
+    children: [
+      {
+        path: "/itemExpanded",
+        element: <ItemExpanded />,
       },
     ],
   },
