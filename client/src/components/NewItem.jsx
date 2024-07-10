@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import supabase from "../supabaseClient";
 
 export default function NewItem() {
     const [form, setForm] = useState({
@@ -19,24 +20,19 @@ export default function NewItem() {
             const id = params.id?.toString() || undefined;
             if (!id) return;
             setIsNew(false);
-            const response = await fetch(
-                `http://localhost:5050/item/${params.id.toString()}`
-            );
-            if (!response.ok) {
-                const message = `An error has occurred: ${response.statusText}`;
-                console.error(message);
-                return;
-            }
-            const item = await response.json();
-            if (!item) {
-                console.warn(`item with id ${id} not found`);
+            const { data: item, error } = await supabase
+                .from('items')
+                .select('*')
+                .eq('id', id)
+                .single();
+            if (error) {
+                console.error('Error fetching item:', error);
                 navigate("/");
                 return;
             }
             setForm(item);
         }
         fetchData();
-        return;
     }, [params.id, navigate]);
 
     // These methods will update the state properties.
@@ -49,37 +45,27 @@ export default function NewItem() {
     // This function will handle the submission.
     async function onSubmit(e) {
         e.preventDefault();
-        const new_item = { ...form };
-        console.log(JSON.stringify(new_item));
+        const newItem = { ...form };
         try {
             let response;
             if (isNew) {
-                // if we are adding a new item we will POST to /item.
-                response = await fetch("http://localhost:5050/item", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(new_item),
-                });
-
-                console.log(response.body);
+                // if we are adding a new item we will insert into the 'items' table.
+                response = await supabase
+                    .from('items')
+                    .insert([newItem]);
             } else {
-                // if we are updating a item we will PATCH to /item/:id.
-                response = await fetch(`http://localhost:5050/item/${params.id}`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(new_item),
-                });
+                // if we are updating an item we will update the 'items' table.
+                response = await supabase
+                    .from('items')
+                    .update(newItem)
+                    .eq('id', params.id);
             }
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+    
+            if (response.error) {
+                throw response.error;
             }
         } catch (error) {
-            console.error('A problem occurred with your fetch operation: ', error);
+            console.error('A problem occurred with your Supabase operation:', error.message, error.details);
         } finally {
             setForm({
                 item_title: "",
@@ -92,6 +78,7 @@ export default function NewItem() {
             navigate("/");
         }
     }
+    
 
     // This following section will display the form that takes the input from the user.
     return (

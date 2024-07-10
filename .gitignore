@@ -1,1 +1,2 @@
-server/config.env
+server/supabaseClient.js
+client/src/supabaseClient.js

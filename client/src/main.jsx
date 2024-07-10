@@ -7,7 +7,7 @@ import {
 import App from "./App";
 import Record from "./components/Record";
 import ItemList from "./components/ItemList";
-import RecordList from "./components/RecordList";
+// import RecordList from "./components/RecordList";
 import "./index.css";
 import NewItem from "./components/NewItem";
 import Dev from "./components/Dev"
