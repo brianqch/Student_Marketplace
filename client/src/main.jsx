@@ -12,6 +12,7 @@ import "./index.css";
 import NewItem from "./components/NewItem";
 import Dev from "./components/Dev"
 import ItemExpanded from "./components/ItemExpanded";
+import LoginForm from "./components/LoginForm";
 
 const router = createBrowserRouter([
   {
@@ -71,6 +72,16 @@ const router = createBrowserRouter([
       {
         path: "/itemExpanded",
         element: <ItemExpanded />,
+      },
+    ],
+  },
+  {
+    path: "/login",
+    element: <App />,
+    children: [
+      {
+        path: "/login",
+        element: <LoginForm />,
       },
     ],
   },
