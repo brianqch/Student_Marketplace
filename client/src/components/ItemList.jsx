@@ -78,9 +78,6 @@ export default function ItemList() {
 
   // This method will map out the items on the table
   function itemList() {
-    // items.map((item) => {
-    //   console.log(item.item_title)
-    // });
     return items.map((item) => {
       return (
         <Item
