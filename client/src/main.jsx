@@ -13,6 +13,7 @@ import NewItem from "./components/NewItem";
 import Dev from "./components/Dev"
 import ItemExpanded from "./components/ItemExpanded";
 import LoginForm from "./components/LoginForm";
+import Landing from "./components/Landing";
 
 const router = createBrowserRouter([
   {
@@ -21,7 +22,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <ItemList />,
+        element: <Landing />,
       },
     ],
   },
@@ -82,6 +83,16 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <LoginForm />,
+      },
+    ],
+  },
+  {
+    path: "/dashboard",
+    element: <App />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <ItemList />,
       },
     ],
   },

@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useHistory } from "react";
 import supabase from '../supabaseClient';
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleSignIn = async (event) => {
     event.preventDefault();
@@ -17,7 +19,7 @@ export default function LoginForm() {
     if (error) {
       setError(error.message);
     } else {
-      alert('Sign in successful');
+      navigate('/dashboard');
     }
 
     setLoading(false);
