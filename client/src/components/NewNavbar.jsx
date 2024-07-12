@@ -32,7 +32,11 @@ export default function NewNavbar() {
     };
 
     const handleRedirectToDashboard = () => {
-        navigate('/dashboard');
+        if (user) {
+            navigate('/dashboard');
+        } else {
+            navigate('/');
+        }
     }
 
     return (
@@ -46,7 +50,7 @@ export default function NewNavbar() {
                                 <a href="/dev" className="hover:text-indigo-600 text-gray-700">Dev</a>
                                 <a href="/createNewItem" className="hover:text-indigo-600 text-gray-700">Sell</a>
                                 <a href="#" className="hover:text-indigo-600 text-gray-700">Profile</a>
-                                
+
 
                                 <button onClick={handleLogout} className="hover:text-indigo-600 text-gray-700">Logout</button>
                             </div>
@@ -59,8 +63,7 @@ export default function NewNavbar() {
                     </div>
                     {!user && (
                         <div className="flex space-x-4 items-center">
-                            <a href="/login" className="text-gray-800 text-sm">LOGIN</a>
-                            <a href="/signup" className="bg-indigo-600 px-4 py-2 rounded text-white hover:bg-indigo-500 text-sm">SIGNUP</a>
+                            <a href="/login" className="bg-indigo-600 px-4 py-2 rounded text-white hover:bg-indigo-500 text-sm">GET STARTED</a>
                         </div>
                     )}
                 </div>
