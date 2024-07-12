@@ -5,16 +5,16 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import App from "./App";
-import Record from "./components/Record";
-import ItemList from "./components/ItemList";
-// import RecordList from "./components/RecordList";
+import ItemList from "./components/Shop Page/ItemList";
 import "./index.css";
-import NewItem from "./components/NewItem";
-import Dev from "./components/Dev"
-import ItemExpanded from "./components/ItemExpanded";
-import LoginForm from "./components/LoginForm";
-import Landing from "./components/Landing";
-import LoginPage from "./components/LoginPage";
+import NewItem from "./components/Shop Page/NewItem";
+import ProductCard from "./components/Shop Page/ProductCard"
+import ItemExpanded from "./components/Shop Page/ItemExpanded";
+import LoginForm from "./components/Login Components/LoginForm";
+import Landing from "./components/Landing Page/Landing";
+import LoginPage from "./components/Login Components/LoginPage";
+import ProductView from "./components/Shop Page/ProductView";
+import Dev from "./components/Dev";
 
 const router = createBrowserRouter([
   {
@@ -34,16 +34,6 @@ const router = createBrowserRouter([
       {
         path: "/edit/:id",
         element: <NewItem />,
-      },
-    ],
-  },
-  {
-    path: "/create",
-    element: <App />,
-    children: [
-      {
-        path: "/create",
-        element: <Record />,
       },
     ],
   },
@@ -97,6 +87,16 @@ const router = createBrowserRouter([
       },
     ],
   },
+  // {
+  //   path: "/productView",
+  //   element: <App />,
+  //   children: [
+  //     {
+  //       path: "/productView",
+  //       element: <ProductView />,
+  //     },
+  //   ],
+  // },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

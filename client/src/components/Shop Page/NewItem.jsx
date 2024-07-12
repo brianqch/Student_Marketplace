@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import supabase from "../supabaseClient";
+import supabase from "../../supabaseClient";
 
 export default function NewItem() {
     const [form, setForm] = useState({
