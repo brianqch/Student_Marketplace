@@ -68,6 +68,7 @@ export default function NewNavbar() {
             ) : (
               <div className="hidden md:flex justify-around space-x-4">
                 <Link href="/" className="hover:text-indigo-600 text-gray-700">Home</Link>
+                <Link href="/shop" className="hover:text-indigo-600 text-gray-700">Shop</Link>
                 <Link href="#" className="hover:text-indigo-600 text-gray-700">About Us</Link>
               </div>
             )}
