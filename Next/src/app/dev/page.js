@@ -39,137 +39,107 @@ import * as React from "react"
 
 import { Card, CardContent } from "@/components/ui/card"
 import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
 } from "@/components/ui/carousel"
 
 const ImageCarousel = () => {
-    return (
+  return (
 
-        <Carousel
-            opts={{
-                align: "center",
-                loop: true,
-            }}
-            className="w-full max-w-2xl max-h-xl"
-        >
-            <CarouselContent>
-                {Array.from({ length: 9 }).map((_, index) => (
-                    <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/5">
-                        <div className="p-1">
-                            <Card className="w-full h-full">
-                                <CardContent className="flex items-center justify-center p-10">
-                                    <span className="text-4xl font-semibold">{index + 1}</span>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </CarouselItem>
-                ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-        </Carousel>
-    )
+    <Carousel
+      opts={{
+        align: "center",
+        loop: true,
+      }}
+      className="w-full max-w-2xl max-h-xl"
+    >
+      <CarouselContent>
+        {Array.from({ length: 9 }).map((_, index) => (
+          <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/5">
+            <div className="p-1">
+              <Card className="w-full h-full">
+                <CardContent className="flex items-center justify-center p-10">
+                  <span className="text-4xl font-semibold">{index + 1}</span>
+                </CardContent>
+              </Card>
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </Carousel>
+  )
 }
 
-const AdBox = ({ text, buttonText, widthRatio, heightRatio, isLeft  }) => {
-    const lines = text.split('\n').map((line, index) => (
-        <React.Fragment key={index}>
-            {line}
-            {index < text.split('\n').length - 1 && <br />}
-        </React.Fragment>
-    ));
+const GuideBlockButton = ({ link, isLeft, text }) => {
+  return (
+    
+    <div className={`flex flex-row items-center justify-between max-w-40 bg-white border border-gray-500 rounded-full pl-4 w-full h-8`}>
+      <div className="flex flex-col justify-center">
+        <span className="text-sm font-semibold text-blue-700 ">{text}</span>
+      </div>
+      <button className="flex items-center justify-center aspect-square h-full bg-blue-500 rounded-full text-white text-xl font-bold">
+        &gt;
+      </button>
+    </div>
 
-    //     <div className="w-64 h-32 bg-gray-300 border border-gray-500 rounded-lg p-4">
-    //       <div className="flex items-end justify-start h-full">
-    //         <span className={`text-xl font-semibold text-gray-700`}>{lines}</span>
-    //         <button className={`text-xl font-semibold text-gray-700`}> Shop clothes</button>
-    //       </div>
-    //     </div>
-    //   
-    return (
-        <div className={`${isLeft ? `justify-start`:`justify-end`} flex flex-row h-40 bg-gray-300 border border-gray-500 rounded-lg p-4`}>
-            <div className="flex flex-col justify-end h-full">
-                <span className={`text-3xl font-bold text-gray-700 ${isLeft ? `text-left` : `text-right`}`} >{lines}</span>
-                <button className={`flex text-xl font-bold text-gray-700 ${isLeft ? `justify-start` : `justify-end`}`}>{buttonText}</button>
-            </div>
+    
+    
+  )
+}
+
+const GuideBlock = ({ text, textColor, buttonText, buttonTextColor, heightType, isLeft }) => {
+  const lines = text.split('\n').map((line, index) => (
+    <React.Fragment key={index}>
+      {line}
+      {index < text.split('\n').length - 1 && <br />}
+    </React.Fragment>
+  ));
+  return (
+    <div className={`${isLeft ? 'justify-start' : 'justify-end'} flex flex-row ${heightType === 'tall' ? 'h-60' : 'h-48'} bg-gray-300 border border-gray-500 rounded-lg p-6`}>
+        <div className="flex flex-col justify-end h-full w-full">
+            <span className={`text-xl sm:text-2xl md:text-3xl font-bold text-gray-700 break-words overflow-hidden ${isLeft ? 'text-left' : 'text-right'}`}>
+                {lines}
+            </span>
+            <GuideBlockButton isLeft={isLeft} text={buttonText}></GuideBlockButton>
         </div>
-    );
-
+    </div>
+);
 }
-
-/**
- * 
- <div className="flex flex-col flex-wrap justify-center">
-  <div className="flex flex-row w-full">
-    <div className="basis-1/2">
-      <AdBox className="w-full" text={"NEW YEAR, \n NEW YOU"} buttonText={"Shop clothes"} widthRatio={0.5} heightRatio={0.5} isLeft={true} />
-    </div>
-    <div className="basis-1/2">
-      <AdBox className="w-full" text={"TECH FOR LESS"} widthRatio={0.5} heightRatio={0.5} isLeft={false} />
-    </div>
-  </div>
-  <div className="flex flex-row w-full">
-    <div className="basis-3/4">
-      <AdBox className="w-full" text={"NEW YEAR, \n NEW YOU"} widthRatio={0.5} heightRatio={0.5} isLeft={true} />
-    </div>
-    <div className="basis-1/4">
-      <AdBox className="w-full" text={"TECH FOR LESS"} widthRatio={0.5} heightRatio={0.5} isLeft={false} />
-    </div>
-  </div>
-</div>
-
-
-            <div className="flex flex-row flex-wrap justify-center">
-                <div className="flex flex-col flex-wrap">
-                  <div className="flex flex-row basis-1/2">
-                      <AdBox className="basis-1/2" text={"NEW YEAR, \n NEW YOU"} buttonText={"Shop clothes"} widthRatio={0.5} heightRatio={0.5} isLeft={true}></AdBox>
-                      <AdBox className="basis-1/2" text={"TECH FOR LESS"} buttonText={"Shop electronics"} widthRatio={0.5} heightRatio={0.5} isLeft={false}></AdBox>
-                  </div>
-                  <div className="flex flex-row basis-1/2">
-                      <AdBox className="basis-3/4" text={"THE MOVE-IN \n EDITION"} buttonText={"Shop home"} widthRatio={0.5} heightRatio={0.5} isLeft={true}></AdBox>
-                      <AdBox className="basis-1/4" text={"SOMETHING \n ELSE?"} buttonText={"Shop everything else"} widthRatio={0.5} heightRatio={0.5} isLeft={false}></AdBox>
-                  </div>
-                </div>
-            </div>
-
- * 
- * 
- * 
- */
 
 export default function LandingPage() {
-    return (
-        <>
-            <div className="flex flex-col items-center justify-center">
+  return (
+    <>
+      <div className="flex flex-col items-center justify-center">
+        {/* IMAGE CAROUSEL */}
+        <ImageCarousel></ImageCarousel>
+      </div>
 
-                <ImageCarousel></ImageCarousel>
-            </div>
-
-        <div className="flex flex-col flex-wrap justify-center gap-5">
-          <div className="flex flex-col md:flex-row w-full gap-5">
-            <div className="md:basis-1/2 w-full gap-5">
-              <AdBox className="w-full" text={"NEW YEAR, \n NEW YOU"} buttonText={"Shop clothes"} widthRatio={0.5} heightRatio={0.5} isLeft={true} />
-            </div>
-            <div className="md:basis-1/2 w-full gap-5">
-              <AdBox className="w-full" text={"TECH FOR LESS"} widthRatio={0.5} heightRatio={0.5} isLeft={false} />
-            </div>
+      {/* GUIDE BLOCKS */}
+      <div className="flex flex-col flex-wrap justify-center gap-5 md:px-52">
+        <div className="flex flex-col md:flex-row w-full gap-5">
+          <div className="md:basis-1/2 w-full gap-5">
+            <GuideBlock className="w-full" text={"NEW YEAR, \n NEW YOU"} buttonText={"Shop clothes"} heightType={"short"} isLeft={true} />
           </div>
-          <div className="flex flex-col md:flex-row w-full gap-5">
-            <div className="md:basis-3/4 w-full">
-              <AdBox className="w-full" text={"NEW YEAR, \n NEW YOU"} widthRatio={0.5} heightRatio={0.5} isLeft={true} />
-            </div>
-            <div className="md:basis-1/4 w-full">
-              <AdBox className="w-full" text={"TECH FOR LESS"} widthRatio={0.5} heightRatio={0.5} isLeft={false} />
-            </div>
+          <div className="md:basis-1/2 w-full gap-5">
+            <GuideBlock className="w-full" text={"TECH FOR LESS"} buttonText={"Shop electronics"} heightType={"short"} isLeft={false} />
           </div>
         </div>
+        <div className="flex flex-col md:flex-row w-full gap-5">
+          <div className="md:basis-3/4 w-full">
+            <GuideBlock className="w-full" text={"THE MOVE-IN \n EDITION"} buttonText={"Shop home"} heightType={"tall"} isLeft={true} />
+          </div>
+          <div className="md:basis-1/4 w-full">
+            <GuideBlock className="w-full" text={"SOMETHING \n ELSE?"} buttonText={"Shop everything else"} heightType={"tall"} isLeft={false} />
+          </div>
+        </div>
+      </div>
 
+    </>
 
-        </>
-
-    )
+  )
 }
