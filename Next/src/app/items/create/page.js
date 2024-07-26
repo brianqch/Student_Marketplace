@@ -128,34 +128,34 @@ const CreateItem = ({ params }) => {
                 <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-slate-900/10 pb-12 md:grid-cols-2">
                     <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 ">
                         <div className="sm:col-span-4">
-                            <div className="mt-2">
-                                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md p-3">
+                            <div className="flex flex-col gap-1 mt-2">
+                                <div className="flex sm:max-w-md border-dashed border-b-2 border-black">
                                     <input
                                         type="text"
                                         name="item_title"
                                         id="item_title"
-                                        className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6"
-                                        placeholder="Title"
+                                        className="block flex-1 border-0 bg-transparent px-0 py-1.5 text-slate-900 focus:bg-yamber focus:ring-0 text-lg sm:leading-6"
                                         value={form.item_title}
                                         onChange={(e) => updateForm({ item_title: e.target.value })}
                                     />
                                 </div>
+                                <span className="">Product Name</span>
                             </div>
                         </div>
                         <div className="sm:col-span-4">
-                            <div className="mt-2">
-                                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md p-3">
+                            <div className="flex flex-col gap-1 mt-2">
+                            <div className="flex sm:max-w-md border-dashed border-b-2 border-black">
                                     <span className="block flex border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6">$</span>
                                     <input
                                         type="text"
                                         name="item_price"
                                         id="item_price"
-                                        className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6"
-                                        placeholder="0.00"
+                                        className="block flex-1 border-0 bg-transparent px-0 py-1.5 text-slate-900 focus:bg-gray-200 focus:ring-0 text-lg sm:leading-6"
                                         value={form.item_price}
                                         onChange={(e) => updateForm({ item_price: e.target.value })}
                                     />
                                 </div>
+                                <span className="">Price</span>
                             </div>
                         </div>
                         <div className="sm:col-span-4">
