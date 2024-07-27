@@ -16,10 +16,8 @@ module.exports = {
         "2xl": "1400px",
       },
     },
-    colors: {
-      'yamber': '#fff9bf',
-    },
     extend: {
+    
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -54,6 +52,11 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        'yamber': '#fff9bf',
+        'uni-blue': '#0064FA',
+      },
+      fontFamily: {
+        rammetto: ['"Rammetto One"', 'sans-serif']
       },
       borderRadius: {
         lg: "var(--radius)",
