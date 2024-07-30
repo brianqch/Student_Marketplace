@@ -1,10 +1,12 @@
-
-
 export default function ProductCard(props) {
-  // product card ref: https://tailwindcomponents.com/component/tailwind-css-ecommerce-card-by-material-tailwind
   return (
+    <div className="relative aspect-h-1 aspect-w-1 w-full lg:aspect-none  bg-white bg-clip-border border border-black text-gray-700 transition-shadow duration-300 hover:shadow-right-bottom hover:shadow-gray-400 cursor-pointer">
+      
+      {/* SVG Icon */}
+      <div className="absolute top-[-1.5rem] left-[-1.5rem] z-20">
+        <img src="/vouched.svg" alt="Icon" className="h-16 w-16" />
+      </div>
 
-    <div className="aspect-h-1 aspect-w-1 w-full lg:aspect-none overflow-hidden bg-white bg-clip-border border border-black text-gray-700 transition-shadow duration-300 hover:shadow-right-bottom hover:shadow-gray-400 cursor-pointer">
       {/* Image */}
       <div className="aspect-square mx-2 mt-2 overflow-hidden border border-black bg-white bg-clip-border text-gray-700">
         <img
@@ -13,6 +15,7 @@ export default function ProductCard(props) {
           alt="Image"
         />
       </div>
+
       {/* Content */}
       <div className="px-2 py-3">
         <div className="mb-2 flex pb-1">
@@ -25,11 +28,11 @@ export default function ProductCard(props) {
             {props.item.item_title || "Title"}
           </p>
         </div>
-        <p className="block font-sans text-base font-normal	leading-none text-blue-gray-900 antialiased">
-            {'$'+props.item.item_price || "Price"}
-          </p>
+        <p className="block font-sans text-base font-normal leading-none text-blue-gray-900 antialiased">
+          {'$' + props.item.item_price || "Price"}
+        </p>
       </div>
-     
+
     </div>
   );
 }

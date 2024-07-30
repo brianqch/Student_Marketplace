@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
     Dialog,
     DialogBackdrop,
@@ -19,6 +19,7 @@ import ProductCard from './ProductCard'; // Adjust the path as needed
 import supabase from '../../lib/supabase'; // Adjust the path as needed
 
 
+// Filter
 const sortOptions = [
     { name: 'Most Popular', href: '#', current: true },
     { name: 'Best Rating', href: '#', current: false },
@@ -87,18 +88,32 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-async function fetchItems() {
-    const { data: items, error } = await supabase.from('items').select('*');
-    if (error) {
-        console.error('Error fetching items:', error);
-        return [];
-    }
-    return items;
-}
 
-export default async function FilterMenu() {
+export default function FilterMenu() {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
-    const items = await fetchItems();
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+
+    useEffect(() => {
+        const fetchItems = async () => {
+            const { data: items, error } = await supabase.from('items').select('*');
+            if (error) {
+                console.error('Error fetching items:', error);
+                setItems([]);
+            } else {
+                setItems(items);
+            }
+            setLoading(false);
+        };
+
+        fetchItems();
+    }, []);
+
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="bg-white">
@@ -289,7 +304,7 @@ export default async function FilterMenu() {
                                 <div className="bg-white">
 
                                     <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                                    <span >All products <span className="text-gray-600">({items ? items.length : 0} items)</span></span>
+                                        <span >All products <span className="text-gray-600">({items ? items.length : 0} items)</span></span>
 
                                         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                             {items.map((item) => (
