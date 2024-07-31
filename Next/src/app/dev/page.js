@@ -34,46 +34,70 @@
 // //     );
 // // }
 
+import { Card, CardContent } from "@/components/ui/card"
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel"
+import React from 'react';
+import supabase from '../../lib/supabase'; // Adjust the path as needed
 
-// import * as React from "react"
 
-// import { Card, CardContent } from "@/components/ui/card"
-// import {
-//   Carousel,
-//   CarouselContent,
-//   CarouselItem,
-//   CarouselNext,
-//   CarouselPrevious,
-// } from "@/components/ui/carousel"
 
-// const ImageCarousel = () => {
-//   return (
+async function fetchData() {
+    const { data: items, error } = await supabase.from('items').select('*');
+    if (error) {
+        console.error('Error fetching items:', error);
+        return [];
+    } else {
+        return items;
+    }
+};
+export default async function ImageCarousel() {
+    const data = await fetchData();
 
-//     <Carousel
-//       opts={{
-//         align: "center",
-//         loop: true,
-//       }}
-//       className="w-full max-w-2xl max-h-xl"
-//     >
-//       <CarouselContent>
-//         {Array.from({ length: 9 }).map((_, index) => (
-//           <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/5">
-//             <div className="p-1">
-//               <Card className="w-full h-full">
-//                 <CardContent className="flex items-center justify-center p-10">
-//                   <span className="text-4xl font-semibold">{index + 1}</span>
-//                 </CardContent>
-//               </Card>
-//             </div>
-//           </CarouselItem>
-//         ))}
-//       </CarouselContent>
-//       <CarouselPrevious />
-//       <CarouselNext />
-//     </Carousel>
-//   )
+
+    return (
+
+        <Carousel
+            opts={{
+                align: "center",
+                loop: true,
+            }}
+            className="w-full max-w-2xl max-h-xl"
+        >
+            <CarouselContent>
+                {data.map((item, index) => (
+                    <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/5">
+                        <div className="p-1">
+                            <Card className="w-full h-full">
+                                <CardContent className="flex items-center justify-center p-10">
+                                    <span className="text-4xl font-semibold">{item.id}</span>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </CarouselItem>
+                ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+        </Carousel>
+    )
+}
+
+
+// export async function getServerSideProps() {
+//   // Fetch data from external API
+//   const res = await fetch('https://api.github.com/repos/vercel/next.js')
+//   const repo = await res.json()
+//   // Pass data to the page via props
+//   return { props: { repo } }
 // }
+
+// export default ImageCarousel;
 
 // const GuideBlockButton = ({ link, isLeft, text }) => {
 //   return (
@@ -144,7 +168,10 @@
 //   )
 // }
 
-import React from 'react';
+
+
+
+// import React from 'react';
 
 
 

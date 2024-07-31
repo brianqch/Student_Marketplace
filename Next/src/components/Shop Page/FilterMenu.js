@@ -89,17 +89,18 @@ function classNames(...classes) {
 }
 
 
-export default function FilterMenu() {
+export default function FilterMenu({}) {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
-
+    
     useEffect(() => {
         const fetchItems = async () => {
             const { data: items, error } = await supabase.from('items').select('*');
             if (error) {
                 console.error('Error fetching items:', error);
+
                 setItems([]);
             } else {
                 setItems(items);
@@ -116,7 +117,7 @@ export default function FilterMenu() {
     }
 
     return (
-        <div className="bg-white">
+        <div className='z-15'>
             <div>
                 {/* Mobile filter dialog */}
                 <Dialog open={mobileFiltersOpen} onClose={setMobileFiltersOpen} className="relative z-40 lg:hidden">

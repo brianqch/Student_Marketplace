@@ -1,4 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rammetto+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Palanquin:wght@100;200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Secular+One&display=swap');
+
+@font-face {
+  font-family: 'Sitara Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Sitara Regular'), url('/fonts/Sitara-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Sitara Italic';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Sitara Italic'), url('/fonts/Sitara-Italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Sitara Bold';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Sitara Bold'), url('/fonts/Sitara-Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Sitara Bold Italic';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Sitara Bold Italic'), url('/fonts/Sitara-BoldItalic.woff') format('woff');
+}
 
 @tailwind base;
 @tailwind components;
@@ -59,6 +90,8 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+
 }
 
 @layer base {
@@ -67,5 +100,12 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1, h2, h3 {
+    font-family: 'Secular One', sans-serif;
+  }
+  
+  p {
+    font-family: 'Sitara', sans-serif;
   }
 }

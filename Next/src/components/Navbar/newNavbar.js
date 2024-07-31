@@ -50,9 +50,9 @@ export default function NewNavbar() {
   };
 
   return (
-    <nav className="px-14">
+    <nav className="relative px-14 z-40">
 
-        <div className="flex justify-between h-16 items-center px-10 rounded-full border-2 border-gray-200">
+        <div className="flex justify-between h-16 items-center px-10 rounded-full border-2 border-gray-200 bg-white bg-opacity-50">
   
           {/* Left */}
           <div className="flex items-center space-x-2 max-w-3xl w-full">

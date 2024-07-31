@@ -17,7 +17,17 @@ module.exports = {
       },
     },
     extend: {
-    
+      screens: {
+        "2xl": "1400px",
+        "3xl": "1940px",
+      },
+      fontFamily: {
+        rammetto: ['Rammetto One', 'sans-serif'],
+        palanquin: ['Palanquin', 'sans-serif'],
+        kanit: ['Kanit', 'sans-serif'],
+        sitara: ['Sitara', 'sans-serif'],
+        secularOne: ['Secular One', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -55,9 +65,6 @@ module.exports = {
         'yamber': '#fff9bf',
         'uni-blue': '#0064FA',
       },
-      fontFamily: {
-        rammetto: ['"Rammetto One"', 'sans-serif']
-      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -85,5 +92,6 @@ module.exports = {
   plugins: [
     require("tailwindcss-animate"),
     require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
   ],
 }
