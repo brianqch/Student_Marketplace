@@ -42,8 +42,11 @@ export default async function ImageCarousel() {
                                     <span className="text-4xl font-semibold">{item.id}</span>
                                 </CardContent>
                             </Card>
+                            <p className="pt-1 text-[14px] text-[#959595]">Just now</p>
                         </div>
+
                     </CarouselItem>
+
                 ))}
             </CarouselContent>
             <CarouselPrevious />

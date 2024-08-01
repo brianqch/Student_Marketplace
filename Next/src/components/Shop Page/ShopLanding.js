@@ -24,16 +24,26 @@ const SchoolLanding = ({ school }) => {
                     className="absolute inset-0" // Background image behind everything
                 />
                 {/* Content */}
-                <div className="absolute top-1/4 left-0 flex flex-col text-white pl-20 sm:pl-20 md:pl-40 lg:pl-48 3xl:pl-80 md:pt-28 3xl:pt-44 z-10">
+                <div className="absolute top-1/4 left-0 flex flex-col text-white px-[13%] pt-[8%] z-10 ">
+
                     <div className="flex flex-row items-center mb-2">
-                        <img src="/location_icon.svg" className="h-10 w-10 -ml-2 mr-2" alt="Location Icon" />
-                        <span className="font-palanquin text-md md:text-lg">{school.location}</span>
+                        <img
+                            src="/location_icon.svg"
+                            className="h-[clamp(20px, 0.875vw, 40px)] sm:h-10 -ml-2 mr-2"
+                            alt="Location Icon"
+                        />
+                        <span className="font-palanquin text-[clamp(14px,1vw,1.125rem)] ">
+                            {school.location}
+                        </span>
                     </div>
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl mb-2">
+
+                    <h1 className="text-[clamp(2rem,5vw,3.5rem)] leading-none mb-4 max-h-[550px]">
                         NOW SHOPPING <br />
                         {school.name}
                     </h1>
-                    <p className="pt-2 sm:pt-4 md:pt-8 font-sitara text-sm sm:text-md md:text-lg w-[300px] md:w-[600px]"> <strong>Fiat Lux!</strong> {school.description}</p>
+                    <p className="text-[clamp(12px,1vw,1rem)] pr-[10%] mb-2 w-[65%] lg:w-[550px]">
+                        <strong>Fiat Lux!</strong> {school.description}
+                    </p>
                 </div>
             </div>
 
