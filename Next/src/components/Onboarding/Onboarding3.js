@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Onboarding4(props) {
+export default function Onboarding3(props) {
     return (
         <>
             <div className="flex">
