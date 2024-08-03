@@ -20,16 +20,16 @@ export default function ProductCard(props) {
       <div className="px-2 py-3">
         <div className="mb-2 flex pb-1">
           <p className="block font-sans text-sm font-light leading-none text-blue-gray-900 antialiased">
-            {props.item.item_category || "Category"}
+            {props.item.category || "Category"}
           </p>
         </div>
         <div className="mb-2 flex text-base items-center justify-between">
           <p className="block font-sans text-base font-normal leading-none text-blue-gray-900 antialiased">
-            {props.item.item_title || "Title"}
+            {props.item.title || "Title"}
           </p>
         </div>
         <p className="block font-sans text-base font-normal leading-none text-blue-gray-900 antialiased">
-          {'$' + props.item.item_price || "Price"}
+          {'$' + props.item.price || "Price"}
         </p>
       </div>
 

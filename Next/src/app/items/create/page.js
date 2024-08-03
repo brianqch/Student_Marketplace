@@ -5,12 +5,12 @@ import supabase from '../../../lib/supabase';
 
 const CreateItem = ({ params }) => {
     const [form, setForm] = useState({
-        item_title: "",
-        item_price: "",
-        item_location: "",
-        item_category: "",
-        item_condition: "",
-        item_description: ""
+        title: "",
+        price: "",
+        location: "",
+        category: "",
+        condition: "",
+        description: ""
     });
 
     const router = useRouter();
@@ -47,17 +47,17 @@ const CreateItem = ({ params }) => {
     const conditionDropdownRef = useRef(null);
 
     const filteredCategories = categories.filter((item) =>
-        item.toLowerCase().includes(form.item_category.toLowerCase())
+        item.toLowerCase().includes(form.category.toLowerCase())
     );
 
     const handleCategoryInputChange = (e) => {
-        form.item_category = e.target.value;
+        form.category = e.target.value;
         setCategoryVal(e.target.value);
         setShowCategoryDropdown(true);
     };
 
     const handleCategoryItemClick = (item) => {
-        form.item_category = item;
+        form.category = item;
         setCategoryVal(item);
         setShowCategoryDropdown(false);
     };
@@ -67,7 +67,7 @@ const CreateItem = ({ params }) => {
     };
 
     const handleConditionItemClick = (item) => {
-        form.item_condition = item;
+        form.condition = item;
         setShowConditionDropdown(false);
     };
 
@@ -132,11 +132,11 @@ const CreateItem = ({ params }) => {
                                 <div className="flex sm:max-w-md border-dashed border-b-2 border-black">
                                     <input
                                         type="text"
-                                        name="item_title"
-                                        id="item_title"
+                                        name="title"
+                                        id="title"
                                         className="block flex-1 border-0 bg-transparent px-0 py-1.5 text-slate-900 focus:bg-yamber focus:ring-0 text-lg sm:leading-6"
-                                        value={form.item_title}
-                                        onChange={(e) => updateForm({ item_title: e.target.value })}
+                                        value={form.title}
+                                        onChange={(e) => updateForm({ title: e.target.value })}
                                     />
                                 </div>
                                 <span className="">Product Name</span>
@@ -148,11 +148,11 @@ const CreateItem = ({ params }) => {
                                     <span className="block flex border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6">$</span>
                                     <input
                                         type="text"
-                                        name="item_price"
-                                        id="item_price"
+                                        name="price"
+                                        id="price"
                                         className="block flex-1 border-0 bg-transparent px-0 py-1.5 text-slate-900 focus:bg-gray-200 focus:ring-0 text-lg sm:leading-6"
-                                        value={form.item_price}
-                                        onChange={(e) => updateForm({ item_price: e.target.value })}
+                                        value={form.price}
+                                        onChange={(e) => updateForm({ price: e.target.value })}
                                     />
                                 </div>
                                 <span className="">Price</span>
@@ -163,12 +163,12 @@ const CreateItem = ({ params }) => {
                                 <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md p-3">
                                     <input
                                         type="text"
-                                        name="item_description"
-                                        id="item_description"
+                                        name="description"
+                                        id="description"
                                         className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg h-full sm:leading-6"
                                         placeholder="Description"
-                                        value={form.item_description}
-                                        onChange={(e) => updateForm({ item_description: e.target.value })}
+                                        value={form.description}
+                                        onChange={(e) => updateForm({ description: e.target.value })}
                                     />
                                 </div>
                             </div>
@@ -178,12 +178,12 @@ const CreateItem = ({ params }) => {
                                 <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md p-3">
                                     <input
                                         type="text"
-                                        name="item_location"
-                                        id="item_location"
+                                        name="location"
+                                        id="location"
                                         className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6"
                                         placeholder="Location"
-                                        value={form.item_location}
-                                        onChange={(e) => updateForm({ item_location: e.target.value })}
+                                        value={form.location}
+                                        onChange={(e) => updateForm({ location: e.target.value })}
                                     />
                                 </div>
                             </div>
@@ -193,7 +193,7 @@ const CreateItem = ({ params }) => {
                         <div className="sm:col-span-4">
                             <div className="relative flex flex-col">
                                 <label
-                                    htmlFor="item_category"
+                                    htmlFor="category"
                                     className="block text-sm font-medium leading-6 text-slate-900"
                                 >
                                     Category
@@ -235,7 +235,7 @@ const CreateItem = ({ params }) => {
                         <div className="relative inline-block text-left" ref={conditionDropdownRef}>
                             <div>
                                 <label
-                                    htmlFor="item_condition"
+                                    htmlFor="condition"
                                     className="block text-sm font-medium leading-6 text-slate-900"
                                 >
                                     Condition
@@ -245,7 +245,7 @@ const CreateItem = ({ params }) => {
                                     className="mt-1 flex items-center justify-between w-full p-2 border border-gray-300 rounded-md bg-white text-gray-900"
                                     onClick={handleConditionToggleDropdown}
                                 >
-                                    {form.item_condition || 'Select Condition'}
+                                    {form.condition || 'Select Condition'}
                                     <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
