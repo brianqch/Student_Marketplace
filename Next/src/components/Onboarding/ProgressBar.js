@@ -1,6 +1,6 @@
 import React from "react";
 
-const ProgressBar = ({ step, setStep, totalSteps }) => {
+export default function ProgressBar({step, setStep}) {
     const handleNext = () => {
         if (step < 4) {
             setStep(step + 1);
@@ -42,5 +42,3 @@ const ProgressBar = ({ step, setStep, totalSteps }) => {
         </div>
     );
 };
-
-export default ProgressBar;

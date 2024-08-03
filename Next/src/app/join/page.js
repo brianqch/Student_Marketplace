@@ -1,38 +1,88 @@
 "use client";
 
-import { useState } from 'react';
-import LoginForm from '../../components/Login Components/LoginForm';
-import SignupForm from '../../components/Login Components/SignupForm';
-import ProgressBar from '@/components/Onboarding/ProgressBar';
-import Onboarding1 from '@/components/Onboarding/Onboarding1';
-import Onboarding2 from '@/components/Onboarding/Onboarding2';
-import Onboarding3 from '@/components/Onboarding/Onboarding3';
-import Onboarding4 from '@/components/Onboarding/Onboarding4';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
+import Onboarding1 from "../../components/Onboarding/Onboarding1";
+import Onboarding2 from "../../components/Onboarding/Onboarding2";
+import Onboarding3 from "../../components/Onboarding/Onboarding3";
+import Onboarding4 from "../../components/Onboarding/Onboarding4";
+import ProgressBar from "../../components/Onboarding/ProgressBar";
+
+const variants = {
+  initial: (direction) => ({
+    opacity: 0,
+    y: direction === 'forward' ? '100%' : '-100%',
+  }),
+  animate: {
+    opacity: 1,
+    y: '0%',
+  },
+  exit: (direction) => ({
+    opacity: 0,
+    y: direction === 'forward' ? '-100%' : '100%',
+  }),
+};
+
+const pageTransition = {
+  type: 'spring',
+  duration: 0.55,
+};
+
+const usePrevious = (val) => {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = val;
+  });
+  return ref.current;
+};
 
 export default function JoinPage() {
-    const [step, setStep] = useState(0);
-    const [name, setName] = useState("");
-    const [school, setSchool] = useState("");
+  const [step, setStep] = useState(0);
+  const previousStep = usePrevious(step) ?? step;
 
-    const renderOnboardingComponent = () => {
-        switch (step) {
-            case 0:
-                return <Onboarding1 step={step} setStep={setStep} name={name} setName={setName} />;
-            case 1:
-                return <Onboarding2 step={step} setStep={setStep} name={name} setSchool={setSchool} />;
-            case 2:
-                return <Onboarding3 step={step} setStep={setStep}  />;
-            case 3:
-                return <Onboarding4 step={step} setStep={setStep}  />;
-            default:
-                return <Onboarding1 step={step} setStep={setStep}  />;
-        }
-    };
+  // Determine the direction based on step indices
+  const direction = step > previousStep ? 'forward' : 'back';
 
-    return (
-        <div className="flex flex-col w-full h-screen justify-center items-center">
-            {renderOnboardingComponent()}
-            <ProgressBar step={step} setStep={setStep}/>
-        </div>
-    )
+  // Array of onboarding components
+  const onboardingComponents = [
+    <Onboarding1 key="onboarding1" step={step} setStep={setStep} />,
+    <Onboarding2 key="onboarding2" step={step} setStep={setStep} />,
+    <Onboarding3 key="onboarding3" step={step} setStep={setStep} />,
+    <Onboarding4 key="onboarding4" step={step} setStep={setStep} />,
+  ];
+
+  const handleNext = () => {
+    if (step < onboardingComponents.length - 1) { // Allow forward navigation if less than last index
+      setStep(prev => prev + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (step > 0) { // Allow backward navigation if greater than 0
+      setStep(prev => prev - 1);
+    }
+  };
+
+  return (
+    <div className="relative flex flex-col w-full h-screen justify-center items-center -mt-16">
+      <MotionConfig transition={pageTransition}>
+        <AnimatePresence initial={false} mode="wait" custom={direction}>
+          <motion.div
+            key={step} // Ensure this key is unique to force re-render
+            custom={direction}
+            variants={variants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="w-full flex justify-center items-center"
+          >
+            {onboardingComponents[step]} {/* Render the component based on the current step index */}
+          </motion.div>
+        </AnimatePresence>
+      </MotionConfig>
+      <div className="absolute bottom-20 w-[80%]">
+        <ProgressBar step={step} setStep={setStep} handleNext={handleNext} handlePrevious={handlePrevious} />
+      </div>
+    </div>
+  );
 }
