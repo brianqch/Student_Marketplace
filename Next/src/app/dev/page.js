@@ -34,60 +34,6 @@
 // //     );
 // // }
 
-import { Card, CardContent } from "@/components/ui/card"
-import {
-    Carousel,
-    CarouselContent,
-    CarouselItem,
-    CarouselNext,
-    CarouselPrevious,
-} from "@/components/ui/carousel"
-import React from 'react';
-import supabase from '../../lib/supabase'; // Adjust the path as needed
-
-
-
-async function fetchData() {
-    const { data: items, error } = await supabase.from('items').select('*');
-    if (error) {
-        console.error('Error fetching items:', error);
-        return [];
-    } else {
-        return items;
-    }
-};
-export default async function ImageCarousel() {
-    const data = await fetchData();
-
-
-    return (
-
-        <Carousel
-            opts={{
-                align: "center",
-                loop: true,
-            }}
-            className="w-full max-w-2xl max-h-xl"
-        >
-            <CarouselContent>
-                {data.map((item, index) => (
-                    <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/5">
-                        <div className="p-1">
-                            <Card className="w-full h-full">
-                                <CardContent className="flex items-center justify-center p-10">
-                                    <span className="text-4xl font-semibold">{item.id}</span>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </CarouselItem>
-                ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-        </Carousel>
-    )
-}
-
 
 // export async function getServerSideProps() {
 //   // Fetch data from external API
@@ -203,3 +149,461 @@ export default async function ImageCarousel() {
 // Adding getLayout to CurvedBackground
 
 // export default CurvedBackground;
+
+
+// "use client";
+// import { useRouter } from 'next/navigation';
+// import { useEffect, useState, useRef } from 'react';
+// import s3 from '../../lib/aws'; // Import the configured S3 instance
+// import supabase from '../../lib/supabase'; // Ensure you have Supabase client configured
+// import { v4 as uuidv4 } from 'uuid'; // To generate unique IDs for S3 keys
+// import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+
+
+// const CreateItem = ({ params }) => {
+//     const [form, setForm] = useState({
+//         title: "",
+//         price: "",
+//         location: "",
+//         category: "",
+//         condition: "",
+//         description: ""
+//     });
+//     const [images, setImages] = useState([]);
+//     const [categoryVal, setCategoryVal] = useState('');
+//     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+//     const [showConditionDropdown, setShowConditionDropdown] = useState(false);
+
+//     const router = useRouter();
+//     const { id } = params;
+//     const conditions = ["New", "Used - Like New", "Used - Good", "Used - Fair"];
+//     const categories = [
+//         "Antiques & Collectibles",
+//         "Arts & Crafts",
+//         "Auto Parts & Accessories",
+//         "Baby Products",
+//         "Books, Movies & Music",
+//         "Cell Phones & Accessories",
+//         "Clothing, Shoes & Accessories",
+//         "Computers & Tablets",
+//         "Electronics",
+//         "Furniture",
+//         "Health & Beauty",
+//         "Home & Garden",
+//         "Jewelry & Watches",
+//         "Musical Instruments",
+//         "Office Supplies",
+//         "Pet Supplies",
+//         "Sports & Outdoors",
+//         "Tools & Home Improvement",
+//         "Toys & Hobbies",
+//         "Video Games & Consoles"
+//     ];
+
+//     const categoryDropdownRef = useRef(null);
+//     const conditionDropdownRef = useRef(null);
+
+
+//     const filteredCategories = categories.filter((item) =>
+//         item.toLowerCase().includes(form.category.toLowerCase())
+//     );
+
+//     const handleCategoryInputChange = (e) => {
+//         form.category = e.target.value;
+//         setCategoryVal(e.target.value);
+//         setShowCategoryDropdown(true);
+//     };
+
+//     const handleCategoryItemClick = (item) => {
+//         form.category = item;
+//         setCategoryVal(item);
+//         setShowCategoryDropdown(false);
+//     };
+
+//     const handleConditionToggleDropdown = () => {
+//         setShowConditionDropdown((prev) => !prev);
+//     };
+
+//     const handleConditionItemClick = (item) => {
+//         form.condition = item;
+//         setShowConditionDropdown(false);
+//     };
+
+//     useEffect(() => {
+//         const handleClickOutside = (event) => {
+//             if (
+//                 categoryDropdownRef.current &&
+//                 !categoryDropdownRef.current.contains(event.target)
+//             ) {
+//                 setShowCategoryDropdown(false);
+//             }
+//             if (
+//                 conditionDropdownRef.current &&
+//                 !conditionDropdownRef.current.contains(event.target)
+//             ) {
+//                 setShowConditionDropdown(false);
+//             }
+//         };
+
+//         document.addEventListener('mousedown', handleClickOutside);
+
+//         return () => {
+//             document.removeEventListener('mousedown', handleClickOutside);
+//         };
+//     }, []);
+
+
+//     function updateForm(value) {
+//         setForm(prev => ({ ...prev, ...value }));
+//     }
+
+//     const handleImageUpload = (e) => {
+//         setImages(Array.from(e.target.files));
+//     };
+
+//     const handleImageRemove = (index) => {
+//         setImages(images.filter((_, i) => i !== index));
+//     };
+
+
+
+
+//     // Function to upload images to S3 using pre-signed URLs
+
+//     const uploadImagesToS3 = async (images) => {
+//         const bucketName = process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME;
+//         const imageUrls = [];
+//         const region = process.env.NEXT_PUBLIC_AWS_REGION; // Ensure this is set
+//         console.log("region", region);
+//         console.log("bucketName", bucketName);
+
+//         if (!bucketName || !region) {
+//             throw new Error('Bucket name or region is not defined');
+//         }
+
+//         if (!Array.isArray(images)) {
+//             throw new Error('Images parameter is not an array');
+//         }
+
+//         const s3 = new S3Client({
+//             region: process.env.NEXT_PUBLIC_AWS_REGION,
+//             credentials: {
+//                 accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+//                 secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+//             },
+//         });
+//         console.log('Type of images:', typeof images);
+//         console.log('Is images an array?', Array.isArray(images));
+//         console.log('Images content:', images);
+
+//         try {
+//             for (const file of images) { 
+//                 if (!(file instanceof File)) {
+//                     throw new Error('Item in images array is not a File object');
+//                 }
+
+//                 const params = {
+//                     Bucket: bucketName,
+//                     Key: `items-images/${Date.now()}_${file.name}`, 
+//                     Body: file,
+//                     ContentType: file.type,
+//                 };
+
+//                 const command = new PutObjectCommand(params);
+//                 await s3.send(command);
+
+//                 const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${params.Key}`;
+//                 imageUrls.push(imageUrl);
+//             }
+//         } catch (error) {
+//             console.error('Error uploading images to S3:', error);
+//             throw error;
+//         }
+
+//         return imageUrls;
+//     };
+
+
+//     const onSubmit = async (e) => {
+//         e.preventDefault();
+//         const newItem = { ...form };
+//         try {
+//             // Insert item data into Supabase
+//             const { data, error } = await supabase
+//                 .from('items')
+//                 .insert(newItem)
+//                 .select();
+
+//             if (error) throw error;
+
+//             console.log(data)
+//             const itemId = data[0].id; // Get the newly inserted item's ID
+//             console.log(images.length)
+//             // Handle image uploads
+//             if (images.length > 0) {
+//                 console.log(images)
+//                 const imageUrls = await uploadImagesToS3(images);
+//                 console.log('Image URLs:', imageUrls);
+
+//                 // Insert image URLs into Supabase
+//                 await Promise.all(imageUrls.map(url =>
+//                     supabase
+//                         .from('items_images')
+//                         .insert({ item_id: itemId, image_url: url })
+//                 ));
+//             }
+
+//             router.push("/");
+//         } catch (error) {
+//             console.error('Error:', error.message);
+//         }
+//     };
+
+//     return (
+//         <>
+//             <h2 className="text-xl font-semibold p-4">Item For Sale</h2>
+//             <form onSubmit={onSubmit} className="border rounded-lg p-4">
+//                 <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-slate-900/10 pb-12 md:grid-cols-2">
+//                     <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 ">
+//                         <div className="sm:col-span-4">
+//                             <div className="flex flex-col gap-1 mt-2">
+//                                 <div className="flex sm:max-w-md border-dashed border-b-2 border-black">
+//                                     <input
+//                                         type="text"
+//                                         name="title"
+//                                         id="title"
+//                                         className="block flex-1 border-0 bg-transparent px-0 py-1.5 text-slate-900 focus:bg-yellow-100 focus:ring-0 text-lg sm:leading-6"
+//                                         value={form.title}
+//                                         onChange={(e) => updateForm({ title: e.target.value })}
+//                                     />
+//                                 </div>
+//                                 <span className="">Product Name</span>
+//                             </div>
+//                         </div>
+//                         <div className="sm:col-span-4">
+//                             <div className="flex flex-col gap-1 mt-2">
+//                                 <div className="flex sm:max-w-md border-dashed border-b-2 border-black">
+//                                     <span className="block flex border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6">$</span>
+//                                     <input
+//                                         type="text"
+//                                         name="price"
+//                                         id="price"
+//                                         className="block flex-1 border-0 bg-transparent px-0 py-1.5 text-slate-900 focus:bg-gray-200 focus:ring-0 text-lg sm:leading-6"
+//                                         value={form.price}
+//                                         onChange={(e) => updateForm({ price: e.target.value })}
+//                                     />
+//                                 </div>
+//                                 <span className="">Price</span>
+//                             </div>
+//                         </div>
+//                         <div className="sm:col-span-4">
+//                             <div className="mt-2">
+//                                 <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md p-3">
+//                                     <input
+//                                         type="text"
+//                                         name="description"
+//                                         id="description"
+//                                         className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg h-full sm:leading-6"
+//                                         placeholder="Description"
+//                                         value={form.description}
+//                                         onChange={(e) => updateForm({ description: e.target.value })}
+//                                     />
+//                                 </div>
+//                             </div>
+//                         </div>
+//                         <div className="sm:col-span-4">
+//                             <div className="mt-2">
+//                                 <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md p-3">
+//                                     <input
+//                                         type="text"
+//                                         name="location"
+//                                         id="location"
+//                                         className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6"
+//                                         placeholder="Location"
+//                                         value={form.location}
+//                                         onChange={(e) => updateForm({ location: e.target.value })}
+//                                     />
+//                                 </div>
+//                             </div>
+//                         </div>
+
+//                         {/* Category */}
+//                         <div className="sm:col-span-4">
+//                             <div className="relative flex flex-col">
+//                                 <label
+//                                     htmlFor="category"
+//                                     className="block text-sm font-medium leading-6 text-slate-900"
+//                                 >
+//                                     Category
+//                                 </label>
+//                                 <div className="" ref={categoryDropdownRef}>
+//                                     <div className="relative flex items-center">
+//                                         <input
+//                                             type="text"
+//                                             value={categoryVal}
+//                                             onChange={handleCategoryInputChange}
+//                                             placeholder="Category"
+//                                             className="flex-1 rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600 p-3"
+//                                             onFocus={() => setShowCategoryDropdown(true)}
+//                                         />
+//                                         <svg className="w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+//                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+//                                         </svg>
+//                                     </div>
+
+
+//                                     {showCategoryDropdown && filteredCategories.length > 0 && (
+//                                         <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-y-auto max-h-32">
+//                                             {filteredCategories.map((op, index) => (
+//                                                 <li
+//                                                     key={index}
+//                                                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+//                                                     onClick={() => handleCategoryItemClick(op)}
+//                                                 >
+//                                                     {op}
+//                                                 </li>
+//                                             ))}
+//                                         </ul>
+//                                     )}
+//                                 </div>
+//                             </div>
+//                         </div>
+
+//                         {/* Condition */}
+//                         <div className="sm:col-span-4">
+//                             <div className="relative flex flex-col" ref={conditionDropdownRef}>
+//                                 <label
+//                                     htmlFor="condition"
+//                                     className="block text-sm font-medium leading-6 text-slate-900"
+//                                 >
+//                                     Condition
+//                                 </label>
+//                                 <div className="relative flex items-center">
+//                                     <input
+//                                         type="text"
+//                                         value={form.condition}
+//                                         readOnly
+//                                         placeholder="Condition"
+//                                         className="flex-1 rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600 p-3 cursor-pointer"
+//                                         onClick={handleConditionToggleDropdown}
+//                                     />
+//                                     {showConditionDropdown && (
+//                                         <ul className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+//                                             {conditions.map((condition, index) => (
+//                                                 <li
+//                                                     key={index}
+//                                                     onClick={() => handleConditionItemClick(condition)}
+//                                                     className="p-2 cursor-pointer hover:bg-gray-200"
+//                                                 >
+//                                                     {condition}
+//                                                 </li>
+//                                             ))}
+//                                         </ul>
+//                                     )}
+//                                 </div>
+//                             </div>
+//                         </div>
+
+//                         {/* Images */}
+//                         <div className="sm:col-span-4">
+//                             <label
+//                                 htmlFor="images"
+//                                 className="block text-sm font-medium leading-6 text-slate-900"
+//                             >
+//                                 Images
+//                             </label>
+//                             <input
+//                                 type="file"
+//                                 id="images"
+//                                 name="images"
+//                                 accept="image/*"
+//                                 multiple
+//                                 onChange={handleImageUpload}
+//                                 className="block mt-2"
+//                             />
+//                             <div className="mt-2">
+//                                 {images.map((image, index) => (
+//                                     <div key={index} className="flex items-center mt-2">
+//                                         <img
+//                                             src={URL.createObjectURL(image)}
+//                                             alt={`preview-${index}`}
+//                                             className="w-20 h-20 object-cover"
+//                                         />
+//                                         <button
+//                                             type="button"
+//                                             onClick={() => handleImageRemove(index)}
+//                                             className="ml-2 text-red-500"
+//                                         >
+//                                             Remove
+//                                         </button>
+//                                     </div>
+//                                 ))}
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>
+//                 <button
+//                     type="submit"
+//                     className="block w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+//                 >
+//                     Submit
+//                 </button>
+//             </form>
+//         </>
+//     );
+// };
+
+// export default CreateItem;
+"use client"
+// src/components/ImageDisplay.js
+import React, { useEffect, useState } from 'react';
+import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+const ImageDisplay = ({ bucketName, objectKey }) => {
+  const [imageUrl, setImageUrl] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchImageUrl = async () => {
+        const s3 = new S3Client({
+                        region: process.env.NEXT_PUBLIC_AWS_REGION,
+                        credentials: {
+                            accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+                            secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+                        },
+                    });
+      try {
+        const command = new GetObjectCommand({
+          Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME,
+          Key: 'https://unimart-items-images.s3.us-east-2.amazonaws.com/items-images/1722667748359_headshot.jpg',
+        });
+
+        // Log the request details for debugging
+        console.log('Generating URL for:', { bucketName, objectKey });
+
+        const url = await getSignedUrl(s3, command, { expiresIn: 3600 }); // URL expires in 1 hour
+        setImageUrl(url);
+      } catch (err) {
+        console.error('Error generating pre-signed URL:', err);
+        setError(`Error generating pre-signed URL: ${err.message}`);
+      }
+    };
+
+    fetchImageUrl();
+  }, [bucketName, objectKey]);
+
+  if (error) return <p>{error}</p>;
+
+  return (
+    <div>
+      {imageUrl ? (
+        <img src={imageUrl} alt="S3 Image" style={{ maxWidth: '100%', height: 'auto' }} />
+      ) : (
+        <p>Loading...</p>
+      )}
+    </div>
+  );
+};
+
+export default ImageDisplay;

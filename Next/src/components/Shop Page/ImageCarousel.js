@@ -1,12 +1,12 @@
 
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "../ui/card";
 import {
     Carousel,
     CarouselContent,
     CarouselItem,
     CarouselNext,
     CarouselPrevious,
-} from "@/components/ui/carousel"
+} from "../ui/carousel"
 import React from 'react';
 import supabase from '../../lib/supabase'; // Adjust the path as needed
 
