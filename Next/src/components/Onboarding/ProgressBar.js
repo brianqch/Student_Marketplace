@@ -1,17 +1,6 @@
 import React from "react";
 
-export default function ProgressBar({step, setStep}) {
-    const handleNext = () => {
-        if (step < 4) {
-            setStep(step + 1);
-        }
-    };
-
-    const handlePrevious = () => {
-        if (step > 0) {
-            setStep(step - 1);
-        }
-    };
+export default function ProgressBar({step, setStep, handleNext, handlePrevious}) {
 
     const renderProgressSegments = () => {
         const segments = [];
@@ -24,7 +13,6 @@ export default function ProgressBar({step, setStep}) {
                 ></div>
             );
         }
-        console.log(segments);
         return segments;
     };
 
