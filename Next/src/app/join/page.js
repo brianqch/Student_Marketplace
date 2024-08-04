@@ -40,6 +40,7 @@ const usePrevious = (val) => {
 export default function JoinPage() {
     const [step, setStep] = useState(0);
     const [firstName, setFirstName] = useState('');
+    const [school, setSchool] = useState('');
     const [error, setError] = useState('');
     const previousStep = usePrevious(step) ?? step;
 
@@ -49,7 +50,7 @@ export default function JoinPage() {
     // Array of onboarding components
     const onboardingComponents = [
         <Onboarding1 key="onboarding1" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} error={error} setError={setError}/>,
-        <Onboarding2 key="onboarding2" step={step} setStep={setStep} firstName={firstName} />,
+        <Onboarding2 key="onboarding2" step={step} setStep={setStep} firstName={firstName} school={school} setSchool={setSchool} error={error} setError={setError} />,
         <Onboarding3 key="onboarding3" step={step} setStep={setStep} />,
         <Onboarding4 key="onboarding4" step={step} setStep={setStep} />,
     ];
@@ -57,6 +58,8 @@ export default function JoinPage() {
     const handleNext = () => {
         if (firstName.length === 0) {
             setError("*Please enter your first name.");
+        } else if (school.length === 0) {
+            setError("*Please choose a school.");
         } else if (error.length === 0 && step < onboardingComponents.length - 1) { // Allow forward navigation if less than last index
             setStep(prev => prev + 1);
         }
@@ -67,11 +70,6 @@ export default function JoinPage() {
             setStep(prev => prev - 1);
         }
     };
-
-    useEffect(() => {
-        console.log("Current step:", step);
-        console.log("Name value:", firstName);
-    }, [step, firstName]);
 
     return (
         <div className="relative flex flex-col w-full h-screen justify-center items-center -mt-16">

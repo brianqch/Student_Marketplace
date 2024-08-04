@@ -27,7 +27,7 @@ export default function Onboarding1({ step, setStep, firstName, setFirstName, er
                 <span className="flex font-rammetto text-2xl gap-5 items-center"> Hey there,
                     <input className="text-2xl border-0 border-b-4 border-dashed border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200" type="text" value={firstName} onChange={handleNameChange} placeholder="First Name" />!
                 </span>
-                <span className="font-palanquin">What can we help out with?</span>
+                <span className="font-palanquin mt-2">What can we help out with?</span>
                 <br />
                 <div className="flex gap-5 justify-between items-center font-palanquin">
                     <button className="flex grow items-center px-4 py-4 border border-black hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" onClick={handleNextStep}>
