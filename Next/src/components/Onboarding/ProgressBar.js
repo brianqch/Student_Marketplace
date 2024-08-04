@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function ProgressBar({step, setStep, handleNext, handlePrevious}) {
+export default function ProgressBar({ step, setStep, handleNext, handlePrevious }) {
 
     const renderProgressSegments = () => {
         const segments = [];
@@ -24,9 +24,15 @@ export default function ProgressBar({step, setStep, handleNext, handlePrevious})
             <div className="flex items-center w-full h-2 gap-5 rounded-full">
                 {renderProgressSegments()}
             </div>
+            {step === 3 
+            ? 
+            <button type="submit" className=" bg-blue-500 text-white py-2 ml-5 w-fit text-nowrap px-3 border-black border-2">
+                LET'S GO!
+            </button> 
+            : 
             <button onClick={handleNext} className="ml-2">
                 &gt;
-            </button>
+            </button>}
         </div>
     );
 };

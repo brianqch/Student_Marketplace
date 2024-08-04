@@ -33,11 +33,11 @@ const Onboarding3 = ({ step, setStep, school, area, setArea, setError }) => {
         <div className="flex flex-col">
             <h1 className="text-2xl font-rammetto">Go bears!</h1>
             <p className="text-lg mt-2 mb-4 font-palanquin">Which part of town are you in?</p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="flex flex-col sm:grid grid-cols-3 gap-2">
                 {areas["University of California, Berkeley"].map((area) => (
                     <button
                         key={area}
-                        className="border border-black px-5 py-4 font-palanquin"
+                        className="border border-black px-4 sm:px-8 py-4 sm:py-8 font-palanquin"
                         onClick={() => handleAreaClick(area)}
                     >
                         {area}

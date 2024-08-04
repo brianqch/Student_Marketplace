@@ -40,9 +40,12 @@ const usePrevious = (val) => {
 export default function JoinPage() {
     const [step, setStep] = useState(0);
     const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [school, setSchool] = useState('');
     const [error, setError] = useState('');
     const [area, setArea] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const previousStep = usePrevious(step) ?? step;
 
     // Determine the direction based on step indices
@@ -53,7 +56,7 @@ export default function JoinPage() {
         <Onboarding1 key="onboarding1" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} error={error} setError={setError}/>,
         <Onboarding2 key="onboarding2" step={step} setStep={setStep} firstName={firstName} school={school} setSchool={setSchool} error={error} setError={setError} />,
         <Onboarding3 key="onboarding3" step={step} setStep={setStep} school={school} area={area} setArea={setArea} error={error} setError={setError}/>,
-        <Onboarding4 key="onboarding4" step={step} setStep={setStep} />,
+        <Onboarding4 key="onboarding4" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} lastName={lastName} setLastName={setLastName} error={error} setError={setError} email={email} setEmail={setEmail} password={password} setPassword={setPassword}/>,
     ];
 
     const handleNext = () => {
@@ -82,11 +85,12 @@ export default function JoinPage() {
                 animate="animate"
                 exit="exit"
                 transition={pageTransition}
-                className="w-full flex justify-center items-center"
+                className="w-full h-[90%] flex justify-center items-center"
             >
                 {onboardingComponents[step]}
             </motion.div>
-            <div className="absolute bottom-20 w-[80%]">
+            {/* <div className="absolute bottom-20 w-[80%]"> */}
+            <div className="w-full sm:w-[80%] h-[10%]">
                 <ProgressBar step={step} setStep={setStep} handleNext={handleNext} handlePrevious={handlePrevious} error={error} setError={setError} />
             </div>
         </div>
