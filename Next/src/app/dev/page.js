@@ -370,14 +370,14 @@ const CreateItem = ({ params }) => {
         const imageUrls = await uploadImagesToS3(images);
         console.log('Image URLs:', imageUrls);
         const { error } = await supabase
-        .from('items_images')
-        .insert([{ item_id: itemId, image_url_arr: imageUrls }]);
-        
+          .from('items_images')
+          .insert([{ item_id: itemId, image_url_arr: imageUrls }]);
+
 
         if (error) {
           console.error('Error inserting image data:', error);
         } else {
-            console.log('Data inserted successfully');
+          console.log('Data inserted successfully');
         }
 
       }
@@ -393,46 +393,55 @@ const CreateItem = ({ params }) => {
       <h2 className="text-xl font-semibold p-4">Item For Sale</h2>
       <form onSubmit={onSubmit} className="border rounded-lg p-4">
         <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-slate-900/10 pb-12 md:grid-cols-2">
-          <div className="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 ">
+          <div className="grid max-w-2xl grid-cols-1 gap-x-6  ">
+            {/* Product Name */}
             <div className="sm:col-span-4">
               <div className="flex flex-col gap-1 mt-2">
-                <div className="flex sm:max-w-md border-dashed border-b-2 border-black">
+                <span className="">Product Name</span>
+                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
                   <input
                     type="text"
                     name="title"
                     id="title"
-                    className="block flex-1 border-0 bg-transparent px-0 py-1.5 text-slate-900 focus:bg-yellow-100 focus:ring-0 text-lg sm:leading-6"
+                    placeholder='Type here...'
+                    className="block flex-1 border-0 bg-transparent pl-0.5 px-0 py-1.5 text-slate-900 focus:ring-0 text-lg sm:leading-6"
                     value={form.title}
                     onChange={(e) => updateForm({ title: e.target.value })}
                   />
                 </div>
-                <span className="">Product Name</span>
               </div>
             </div>
+            {/* Price */}
             <div className="sm:col-span-4">
               <div className="flex flex-col gap-1 mt-2">
-                <div className="flex sm:max-w-md border-dashed border-b-2 border-black">
+                <span className="">Price</span>
+
+                <div className="flex sm:max-w-md border-solid border-2 border-black">
+
                   <span className="block flex border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6">$</span>
                   <input
-                    type="text"
+                    type="number"
                     name="price"
                     id="price"
-                    className="block flex-1 border-0 bg-transparent px-0 py-1.5 text-slate-900 focus:bg-gray-200 focus:ring-0 text-lg sm:leading-6"
+                    step="0.01"
+                    min="0"
+                    className="block flex-1 border-0 bg-transparent px-0 py-1.5 text-slate-900 focus:bg-gray-200 focus:ring-0 text-lg sm:leading-6 pl-0.5"
                     value={form.price}
                     onChange={(e) => updateForm({ price: e.target.value })}
                   />
                 </div>
-                <span className="">Price</span>
               </div>
             </div>
+
+            {/* Description */}
             <div className="sm:col-span-4">
-              <div className="mt-2">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md p-3">
-                  <input
-                    type="text"
+              <div className="flex flex-col gap-1 mt-2">
+                <span className="">Description</span>
+                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
+                  <textarea
                     name="description"
                     id="description"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg h-full sm:leading-6"
+                    className="block w-full border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg h-32 sm:leading-6 resize-none"
                     placeholder="Description"
                     value={form.description}
                     onChange={(e) => updateForm({ description: e.target.value })}
@@ -440,9 +449,12 @@ const CreateItem = ({ params }) => {
                 </div>
               </div>
             </div>
+
+            {/* Location */}
             <div className="sm:col-span-4">
-              <div className="mt-2">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md p-3">
+              <div className="flex flex-col gap-1 mt-2">
+                <span className="">Location</span>
+                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
                   <input
                     type="text"
                     name="location"

@@ -1,6 +1,6 @@
 "use client";
-import React, {useState} from "react";
-import { AiOutlineShop, AiOutlineShoppingCart} from "react-icons/ai";
+import React, { useState } from "react";
+import { AiOutlineShop, AiOutlineShoppingCart } from "react-icons/ai";
 
 export default function Onboarding1({ step, setStep, firstName, setFirstName, error, setError }) {
 
@@ -42,7 +42,7 @@ export default function Onboarding1({ step, setStep, firstName, setFirstName, er
                     </button>
 
                 </div>
-            {error && <span className="text-red-500 mt-2">{error}</span>}
+                {error && <span className="text-red-500 mt-2">{error}</span>}
 
             </div>
         </>
