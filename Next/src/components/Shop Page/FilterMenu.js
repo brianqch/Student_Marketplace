@@ -89,23 +89,48 @@ function classNames(...classes) {
 }
 
 
-export default function FilterMenu({}) {
+export default function FilterMenu({ }) {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    
+
     useEffect(() => {
         const fetchItems = async () => {
-            const { data: items, error } = await supabase.from('items').select('*');
-            if (error) {
-                console.error('Error fetching items:', error);
+            setLoading(true);
 
+            try {
+                // Fetch items
+                const { data: items, error: itemsError } = await supabase
+                    .from('items')
+                    .select(`
+                    title,
+                    price,
+                    location,
+                    category,
+                    condition,
+                    description,
+                    created_at,
+                    items_images (
+                        image_url_arr
+                    )
+                `);
+
+                if (itemsError) {
+                    console.error('Error fetching items:', itemsError);
+                    setItems([]);
+                    setLoading(false);
+                    return;
+                } else {
+                    console.log(items)
+                    setItems(items)
+                }
+            } catch (error) {
+                console.error('Error:', error);
                 setItems([]);
-            } else {
-                setItems(items);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
 
         fetchItems();

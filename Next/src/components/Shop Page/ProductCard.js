@@ -10,7 +10,7 @@ export default function ProductCard(props) {
       {/* Image */}
       <div className="aspect-square mx-2 mt-2 overflow-hidden border border-black bg-white bg-clip-border text-gray-700">
         <img
-          src="https://images.unsplash.com/photo-1629367494173-c78a56567877?ixlib=rb-4.0.3&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=927&amp;q=80"
+          src={props.item.items_images[0].image_url_arr[0]}
           className="h-full w-full object-cover"
           alt="Image"
         />
