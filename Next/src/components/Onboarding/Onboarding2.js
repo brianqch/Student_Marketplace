@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import SchoolSearchBar from "./SchoolSearchBar";
 import SchoolDropdown from "./SchoolDropdown";
 import { IoHappyOutline } from "react-icons/io5";
 

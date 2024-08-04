@@ -42,6 +42,7 @@ export default function JoinPage() {
     const [firstName, setFirstName] = useState('');
     const [school, setSchool] = useState('');
     const [error, setError] = useState('');
+    const [area, setArea] = useState('');
     const previousStep = usePrevious(step) ?? step;
 
     // Determine the direction based on step indices
@@ -51,7 +52,7 @@ export default function JoinPage() {
     const onboardingComponents = [
         <Onboarding1 key="onboarding1" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} error={error} setError={setError}/>,
         <Onboarding2 key="onboarding2" step={step} setStep={setStep} firstName={firstName} school={school} setSchool={setSchool} error={error} setError={setError} />,
-        <Onboarding3 key="onboarding3" step={step} setStep={setStep} />,
+        <Onboarding3 key="onboarding3" step={step} setStep={setStep} school={school} area={area} setArea={setArea} error={error} setError={setError}/>,
         <Onboarding4 key="onboarding4" step={step} setStep={setStep} />,
     ];
 
