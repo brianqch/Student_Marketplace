@@ -3,7 +3,7 @@ import { FcGoogle,  } from "react-icons/fc";
 import { FaListCheck } from "react-icons/fa6";
 import supabase from "../../lib/supabase";
 
-const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, setEmail, password, setPassword, setStep, setError }) => {
+const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, setEmail, password, setPassword, setStep, setError, handlePrevious }) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [firstNameError, setFirstNameError] = useState('');
@@ -90,8 +90,8 @@ const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, se
 
     return (
         <div className="flex flex-col">
-            <h1 className="flex text-2xl font-bold gap-3 items-center"><FaListCheck/> Almost there...</h1>
-            <p className="text-lg mt-2 mb-4">Let's make you an account!</p>
+            <h1 className="flex text-2xl font-rammetto gap-3 items-center"><FaListCheck/> Almost there...</h1>
+            <p className="font-palanquin text-lg mt-2 mb-4">Let's make you an account!</p>
             
             <button onClick={handleGoogleSignUp} className="flex py-4 px-4 rounded border-gray-200 border items-center justify-center gap-3 w-full hover:shadow-md transition-colors duration-100 text-[#3c4043]">
             <FcGoogle />
@@ -104,41 +104,35 @@ const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, se
                     type="text"
                     value={firstName}
                     placeholder="First Name *"
-                    className="p-0 py-2 border-0 border-b-2 border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200 font-palanquin"
+                    className={`p-0 py-2 border-0 border-b-2 border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200 font-palanquin ${firstNameError && `bg-red-200`}` }
                     onChange={handleFirstNameChange}
                 />
-                {firstNameError && <span className="text-red-500">{firstNameError}</span>}
                 <input
                     type="text"
                     value={lastName}
                     placeholder="Last Name *"
-                    className="p-0 py-2 border-0 border-b-2 border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200 font-palanquin"
+                    className={`p-0 py-2 border-0 border-b-2 border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200 font-palanquin ${lastNameError && `bg-red-200`}` }
                     onChange={handleLastNameChange}
                 />
-                {lastNameError && <span className="text-red-500">{lastNameError}</span>}
                 <input
                     type="email"
                     value={email}
                     onChange={handleEmailChange}
                     placeholder="Email *"
-                    className="p-0 py-2 border-0 border-b-2 border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200 font-palanquin"
-                />
-                {emailError && <span className="text-red-500">{emailError}</span>}
+                    className={`p-0 py-2 border-0 border-b-2 border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200 font-palanquin ${emailError && `bg-red-200`}` }                />
                 <input
                     type="password"
                     value={password}
                     onChange={handlePasswordChange}
                     placeholder="Password *"
-                    className="p-0 py-2 border-0 border-b-2 border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200 font-palanquin"
-                />
+                    className={`p-0 py-2 border-0 border-b-2 border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200 font-palanquin ${passwordError && `bg-red-200`}` }                />
                 <input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm Password *"
-                    className="p-0 py-2 border-0 border-b-2 border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200 font-palanquin"
+                    className={`p-0 py-2 border-0 border-b-2 border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200 font-palanquin ${passwordError && `bg-red-200`}` }
                 />
-                {passwordError && <span className="text-red-500">{passwordError}</span>}
             </form>
             <div className="flex items-center py-5">
                     <input
@@ -148,6 +142,17 @@ const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, se
                         className="mr-2"
                     />
                     <span>By continuing, you agree to our terms and conditions.</span>
+            </div>
+            <br/>
+            <div className="flex justify-between">
+                <button type="submit" className=" bg-white px-4 py-2 w-fit text-nowrap border-black border-2 transition-colors duration-100" onClick={handlePrevious}>
+                    BACK
+                </button>
+                {(firstName && lastName && email && password && confirmPassword) ? <button type="submit" className=" bg-blue-500 text-white px-4 py-2 w-fit text-nowrap border-black border-2 transition-colors duration-100">
+                    LET'S GO
+                </button> : <button type="submit" className=" bg-blue-200 text-white px-4 py-2 w-fit text-nowrap border-black border-2 transition-colors duration-100">
+                    LET'S GO
+                </button>}
             </div>
         </div>
     );

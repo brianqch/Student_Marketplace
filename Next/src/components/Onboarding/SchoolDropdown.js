@@ -1,22 +1,9 @@
 "use client"; // Mark this as a client component
 import { useState, useRef, useEffect } from 'react';
 
-const SchoolDropdown = ({ error, setError, step, setStep, school, setSchool }) => {
-    const schools = [
-        "University of California, Berkeley",
-    ];
+const SchoolDropdown = ({ error, setError, step, setStep, school, setSchool, schools, selectedSchool, setSelectedSchool }) => {
 
     const [showSchoolDropdown, setShowSchoolDropdown] = useState(false);
-
-    const handleNextStep = (selectedSchool) => {
-        if (schools.indexOf(selectedSchool) === -1) {
-            setError("*Please choose your school.");
-        } else {
-            setError('');
-            setStep(step + 1);
-        }
-        console.log("Step: ", step);
-    };
 
     const schoolDropdownRef = useRef(null);
 
@@ -31,9 +18,9 @@ const SchoolDropdown = ({ error, setError, step, setStep, school, setSchool }) =
 
     const handleSchoolItemClick = (item) => {
         setSchool(item);
+        setSelectedSchool(item);
         setShowSchoolDropdown(false);
         console.log("Get to next step");
-        handleNextStep(item);
     };
 
     useEffect(() => {

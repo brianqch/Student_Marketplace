@@ -24,9 +24,8 @@ const variants = {
 };
 
 const pageTransition = {
-    type: "spring",
-    damping: 10,
-    stiffness: 100,
+    type: "easeInOut",
+    duration: 0.55
 };
 
 const usePrevious = (val) => {
@@ -39,6 +38,7 @@ const usePrevious = (val) => {
 
 export default function JoinPage() {
     const [step, setStep] = useState(0);
+    const [activeButton, setActiveButton] = useState(null);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [school, setSchool] = useState('');
@@ -50,14 +50,6 @@ export default function JoinPage() {
 
     // Determine the direction based on step indices
     const direction = step > previousStep ? 'forward' : 'back';
-
-    // Array of onboarding components
-    const onboardingComponents = [
-        <Onboarding1 key="onboarding1" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} error={error} setError={setError}/>,
-        <Onboarding2 key="onboarding2" step={step} setStep={setStep} firstName={firstName} school={school} setSchool={setSchool} error={error} setError={setError} />,
-        <Onboarding3 key="onboarding3" step={step} setStep={setStep} school={school} area={area} setArea={setArea} error={error} setError={setError}/>,
-        <Onboarding4 key="onboarding4" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} lastName={lastName} setLastName={setLastName} error={error} setError={setError} email={email} setEmail={setEmail} password={password} setPassword={setPassword}/>,
-    ];
 
     const handleNext = () => {
         if (firstName.length === 0) {
@@ -75,6 +67,14 @@ export default function JoinPage() {
         }
     };
 
+    // Array of onboarding components
+    const onboardingComponents = [
+        <Onboarding1 key="onboarding1" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} error={error} setError={setError} activeButton={activeButton} setActiveButton={setActiveButton}/>,
+        <Onboarding2 key="onboarding2" step={step} setStep={setStep} firstName={firstName} school={school} setSchool={setSchool} error={error} setError={setError} handlePrevious={handlePrevious} />,
+        <Onboarding3 key="onboarding3" step={step} setStep={setStep} school={school} area={area} setArea={setArea} error={error} setError={setError} handlePrevious={handlePrevious}/>,
+        <Onboarding4 key="onboarding4" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} lastName={lastName} setLastName={setLastName} error={error} setError={setError} email={email} setEmail={setEmail} password={password} setPassword={setPassword} handlePrevious={handlePrevious}/>,
+    ];
+
     return (
         <div className="relative flex flex-col w-full h-screen justify-center items-center -mt-16">
             <motion.div
@@ -85,7 +85,7 @@ export default function JoinPage() {
                 animate="animate"
                 exit="exit"
                 transition={pageTransition}
-                className="w-full h-[90%] flex justify-center items-center"
+                className="w-full h-[90%] flex flex-col justify-center items-center"
             >
                 {onboardingComponents[step]}
             </motion.div>
