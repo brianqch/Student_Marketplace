@@ -84,6 +84,7 @@ const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, se
         });
 
         if (error) {
+            console.log(error);
             setError(error.message);
         }
     };
