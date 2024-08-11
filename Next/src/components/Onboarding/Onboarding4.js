@@ -1,9 +1,12 @@
-import { useState } from 'react';
+"use client";
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { FcGoogle,  } from "react-icons/fc";
 import { FaListCheck } from "react-icons/fa6";
 import supabase from "../../lib/supabase";
 
 const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, setEmail, password, setPassword, setStep, setError, handlePrevious }) => {
+    const router = useRouter();
     const [confirmPassword, setConfirmPassword] = useState('');
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [firstNameError, setFirstNameError] = useState('');
@@ -88,6 +91,37 @@ const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, se
             setError(error.message);
         }
     };
+
+    useEffect(() => {
+        const checkUser = async () => {
+            const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+            if (userError) {
+                console.log(userError);
+                setError(userError.message);
+                return;
+            }
+
+            if (user) {
+                if (user.email.endsWith('.edu')) {
+                    console.log('User has a .edu email:', user.email);
+                    router.push('/next-step');  // Redirect to the next step in the onboarding process
+                } else {
+                    console.log('User does not have a .edu email:', user.email);
+                    setError('Please sign up with a .edu email address.');
+
+                    // Sign out the user immediately
+                    await supabase.auth.signOut();
+                    setLoading(false);
+                }
+            }
+        };
+
+        // Run the check when the component mounts
+        checkUser();
+    }, [router]);
+    
+    
 
     return (
         <div className="flex flex-col">
