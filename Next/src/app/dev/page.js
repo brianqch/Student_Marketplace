@@ -306,8 +306,8 @@ const CreateItem = ({ params }) => {
 
 
 
-    const getPresignedUrl = async (fileName, contentType) => {
-        const response = await fetch(`/api/presigned?fileName=${encodeURIComponent(fileName)}&contentType=${encodeURIComponent(contentType)}`);
+    const getPresignedUrl = async (fileName, contentType, timestamp) => {
+        const response = await fetch(`/api/presigned?fileName=${encodeURIComponent(fileName)}&contentType=${encodeURIComponent(contentType)}&timestamp=${encodeURIComponent(timestamp)}`);
         const data = await response.json();
         return data.signedUrl;
     };
@@ -324,9 +324,10 @@ const CreateItem = ({ params }) => {
             const contentType = file.type;
 
             try {
+                const timestamp = Date.now();
                 // Get a pre-signed URL from your server
-                const presignedUrl = await getPresignedUrl(fileName, contentType);
-
+                const presignedUrl = await getPresignedUrl(fileName, contentType, timestamp);
+                console.log("presignedUrl", presignedUrl)
                 // Upload the file using the pre-signed URL
                 const response = await fetch(presignedUrl, {
                     method: 'PUT',
@@ -343,7 +344,8 @@ const CreateItem = ({ params }) => {
                 // Construct the URL to access the file
                 const bucketName = process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME;
                 const region = process.env.NEXT_PUBLIC_AWS_REGION;
-                const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
+                const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/items-images/${timestamp}_${fileName}`;
+
                 imageUrls.push(imageUrl);
             } catch (error) {
                 console.error('Error uploading image:', error);

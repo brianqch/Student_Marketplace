@@ -16,6 +16,9 @@ export async function GET(request) {
   const searchParams = new URL(request.url).searchParams;
   const fileName = searchParams.get('fileName');
   const contentType = searchParams.get('contentType');
+  const timestamp = searchParams.get('timestamp');
+
+  console.log("time", timestamp)
 
   if (!fileName || !contentType) {
     return new Response(null, { status: 400 });
@@ -31,7 +34,7 @@ export async function GET(request) {
 
   const command = new PutObjectCommand({
     Bucket: s3BucketName,
-    Key: `items-images/${Date.now()}_${fileName}`,
+    Key: `items-images/${timestamp}_${fileName}`,
     ContentType: contentType,
   });
 
