@@ -174,495 +174,557 @@ import imageCompression from 'browser-image-compression'; // Import the image co
 import { NextResponse } from 'next/server';
 
 const CreateItem = ({ params }) => {
-  const [form, setForm] = useState({
-    title: "",
-    price: "",
-    location: "",
-    category: "",
-    condition: "",
-    description: ""
-  });
-  const [images, setImages] = useState([]);
-  const [categoryVal, setCategoryVal] = useState('');
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [showConditionDropdown, setShowConditionDropdown] = useState(false);
+    const [form, setForm] = useState({
+        title: "",
+        price: "",
+        location: "",
+        category: "",
+        condition: "",
+        description: ""
+    });
+    const [images, setImages] = useState([]);
+    const [categoryVal, setCategoryVal] = useState('');
+    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+    const [showConditionDropdown, setShowConditionDropdown] = useState(false);
 
-  const router = useRouter();
-  const { id } = params;
-  const conditions = ["New", "Used - Like New", "Used - Good", "Used - Fair"];
-  const categories = [
-    "Antiques & Collectibles",
-    "Arts & Crafts",
-    "Auto Parts & Accessories",
-    "Baby Products",
-    "Books, Movies & Music",
-    "Cell Phones & Accessories",
-    "Clothing, Shoes & Accessories",
-    "Computers & Tablets",
-    "Electronics",
-    "Furniture",
-    "Health & Beauty",
-    "Home & Garden",
-    "Jewelry & Watches",
-    "Musical Instruments",
-    "Office Supplies",
-    "Pet Supplies",
-    "Sports & Outdoors",
-    "Tools & Home Improvement",
-    "Toys & Hobbies",
-    "Video Games & Consoles"
-  ];
+    const router = useRouter();
+    const { id } = params;
+    const conditions = ["New", "Used - Like New", "Used - Good", "Used - Fair"];
+    const categories = [
+        "Antiques & Collectibles",
+        "Arts & Crafts",
+        "Auto Parts & Accessories",
+        "Baby Products",
+        "Books, Movies & Music",
+        "Cell Phones & Accessories",
+        "Clothing, Shoes & Accessories",
+        "Computers & Tablets",
+        "Electronics",
+        "Furniture",
+        "Health & Beauty",
+        "Home & Garden",
+        "Jewelry & Watches",
+        "Musical Instruments",
+        "Office Supplies",
+        "Pet Supplies",
+        "Sports & Outdoors",
+        "Tools & Home Improvement",
+        "Toys & Hobbies",
+        "Video Games & Consoles"
+    ];
 
-  const categoryDropdownRef = useRef(null);
-  const conditionDropdownRef = useRef(null);
-
-
-  const filteredCategories = categories.filter((item) =>
-    item.toLowerCase().includes(form.category.toLowerCase())
-  );
-
-  const handleCategoryInputChange = (e) => {
-    form.category = e.target.value;
-    setCategoryVal(e.target.value);
-    setShowCategoryDropdown(true);
-  };
-
-  const handleCategoryItemClick = (item) => {
-    form.category = item;
-    setCategoryVal(item);
-    setShowCategoryDropdown(false);
-  };
-
-  const handleConditionToggleDropdown = () => {
-    setShowConditionDropdown((prev) => !prev);
-  };
-
-  const handleConditionItemClick = (item) => {
-    form.condition = item;
-    setShowConditionDropdown(false);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        categoryDropdownRef.current &&
-        !categoryDropdownRef.current.contains(event.target)
-      ) {
-        setShowCategoryDropdown(false);
-      }
-      if (
-        conditionDropdownRef.current &&
-        !conditionDropdownRef.current.contains(event.target)
-      ) {
-        setShowConditionDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+    const categoryDropdownRef = useRef(null);
+    const conditionDropdownRef = useRef(null);
 
 
-  function updateForm(value) {
-    setForm(prev => ({ ...prev, ...value }));
-  }
-
-  const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const compressedFiles = await Promise.all(
-      files.map(file => compressImage(file))
+    const filteredCategories = categories.filter((item) =>
+        item.toLowerCase().includes(form.category.toLowerCase())
     );
-    setImages(compressedFiles);
-  };
 
-  const compressImage = async (file) => {
-    const options = {
-      maxSizeMB: 1, // Maximum size in MB
-      maxWidthOrHeight: 800, // Maximum width or height
-      useWebWorker: true, // Use web workers for faster compression
+    const handleCategoryInputChange = (e) => {
+        form.category = e.target.value;
+        setCategoryVal(e.target.value);
+        setShowCategoryDropdown(true);
     };
-    try {
-      const compressedBlob = await imageCompression(file, options);
-      const compressedFile = new File([compressedBlob], file.name, { type: file.type });
-      return compressedFile;
-    } catch (error) {
-      console.error("Error compressing image:", error);
-      return file;
-    }
-  };
 
-
-  const handleImageRemove = (index) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
-
-
-
-  // Function to upload images to S3 using pre-signed URLs
-
-//   const uploadImagesToS3 = async (images) => {
-//     const bucketName = process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME;
-//     const imageUrls = [];
-//     const region = process.env.NEXT_PUBLIC_AWS_REGION; // Ensure this is set
-
-
-//     if (!bucketName || !region) {
-//       throw new Error('Bucket name or region is not defined');
-//     }
-
-//     if (!Array.isArray(images)) {
-//       throw new Error('Images parameter is not an array');
-//     }
-
-//     console.log('Type of images:', typeof images);
-//     console.log('Is images an array?', Array.isArray(images));
-//     console.log('Images content:', images);
-
-//     try {
-//       for (const file of images) {
-//         if (!(file instanceof File)) {
-//           throw new Error('Item in images array is not a File object');
-//         }
-
-//         const params = {
-//           Bucket: bucketName,
-//           Key: `items-images/${Date.now()}_${file.name}`,
-//           Body: file,
-//           ContentType: file.type,
-//         };
-
-//         const command = new PutObjectCommand(params);
-//         await s3.send(command);
-
-//         const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${params.Key}`;
-//         imageUrls.push(imageUrl);
-//       }
-//     } catch (error) {
-//       console.error('Error uploading images to S3:', error);
-//       throw error;
-//     }
-
-//     return imageUrls;
-//   };
-
-
-async function getFile(filename) {
-    if (!filename) {
-      return NextResponse.json({ error: 'Filename is required' }, { status: 400 });
-    }
-  
-    const params = {
-      Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME,
-      Key: filename,
-      Expires: 60, // URL expiration time in seconds
-      ContentType: 'image/jpeg', // Adjust based on the file type
+    const handleCategoryItemClick = (item) => {
+        form.category = item;
+        setCategoryVal(item);
+        setShowCategoryDropdown(false);
     };
-  
-    try {
-      // Use getSignedUrlPromise for async handling
-      const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 60 });
-      console.log(presignedUrl)
-      return NextResponse.json({ url: presignedUrl });
-    } catch (error) {
-      console.error('Error generating presigned URL:', error);
-      return NextResponse.json({ error: 'Failed to generate presigned URL' }, { status: 500 });
+
+    const handleConditionToggleDropdown = () => {
+        setShowConditionDropdown((prev) => !prev);
+    };
+
+    const handleConditionItemClick = (item) => {
+        form.condition = item;
+        setShowConditionDropdown(false);
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                categoryDropdownRef.current &&
+                !categoryDropdownRef.current.contains(event.target)
+            ) {
+                setShowCategoryDropdown(false);
+            }
+            if (
+                conditionDropdownRef.current &&
+                !conditionDropdownRef.current.contains(event.target)
+            ) {
+                setShowConditionDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+
+    function updateForm(value) {
+        setForm(prev => ({ ...prev, ...value }));
     }
-  }
-  
+
+    const handleImageUpload = async (e) => {
+        const files = Array.from(e.target.files);
+        const compressedFiles = await Promise.all(
+            files.map(file => compressImage(file))
+        );
+        setImages(compressedFiles);
+    };
+
+    const compressImage = async (file) => {
+        const options = {
+            maxSizeMB: 1, // Maximum size in MB
+            maxWidthOrHeight: 800, // Maximum width or height
+            useWebWorker: true, // Use web workers for faster compression
+        };
+        try {
+            const compressedBlob = await imageCompression(file, options);
+            const compressedFile = new File([compressedBlob], file.name, { type: file.type });
+            return compressedFile;
+        } catch (error) {
+            console.error("Error compressing image:", error);
+            return file;
+        }
+    };
+
+
+    const handleImageRemove = (index) => {
+        setImages(images.filter((_, i) => i !== index));
+    };
 
 
 
 
 
-const fetchPresignedUrl = async (filename) => {
-    const response = await getFile(filename);
-    // if (!response.ok) {
-    //   throw new Error('Error fetching presigned URL');
-    // }
-    const data = await response.json();
-    return data.url;
-  };
-
-  
-const uploadImagesToS3 = async (images) => {
-    const imageUrls = [];
-  
-    try {
-      for (const file of images) {
-      const presignedUrl = await fetchPresignedUrl(file.name);
-        
-    //   console.log(presignedUrl)
-      const response = await fetch(presignedUrl, {
-        method: 'PUT',
-        body: file,
-        headers: {
-          'Content-Type': file.type,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Error uploading image');
-      }
-
-      // Construct the image URL
-      const imageUrl = presignedUrl.split('?')[0];
-      imageUrls.push(imageUrl);
-    }
-    } catch (error) {
-      console.error('Error uploading images to S3:', error);
-      throw error;
-    }
-  
-    return imageUrls;
-  };
-  
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const newItem = { ...form };
-    try {
-      // Insert item data into Supabase
-      const { data, error } = await supabase
-        .from('items')
-        .insert(newItem)
-        .select();
-
-      if (error) throw error;
-
-      console.log(data)
-      const itemId = data[0].id; // Get the newly inserted item's ID
-      console.log(images.length)
-      // Handle image uploads
-      if (images.length > 0) {
-        console.log(images)
-        const imageUrls = await uploadImagesToS3(images);
-        console.log('Image URLs:', imageUrls);
-        const { error } = await supabase
-          .from('items_images')
-          .insert([{ item_id: itemId, image_url_arr: imageUrls }]);
 
 
-        if (error) {
-          console.error('Error inserting image data:', error);
-        } else {
-          console.log('Data inserted successfully');
+    const getPresignedUrl = async (fileName, contentType) => {
+        const response = await fetch(`/api/presigned?fileName=${encodeURIComponent(fileName)}&contentType=${encodeURIComponent(contentType)}`);
+        const data = await response.json();
+        return data.signedUrl;
+    };
+
+    const uploadImagesToS3 = async (images) => {
+        const imageUrls = [];
+
+        for (const file of images) {
+            if (!(file instanceof File)) {
+                throw new Error('Item in images array is not a File object');
+            }
+
+            const fileName = file.name;
+            const contentType = file.type;
+
+            try {
+                // Get a pre-signed URL from your server
+                const presignedUrl = await getPresignedUrl(fileName, contentType);
+
+                // Upload the file using the pre-signed URL
+                const response = await fetch(presignedUrl, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {
+                        'Content-Type': contentType,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to upload ${fileName}: ${response.statusText}`);
+                }
+
+                // Construct the URL to access the file
+                const bucketName = process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME;
+                const region = process.env.NEXT_PUBLIC_AWS_REGION;
+                const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
+                imageUrls.push(imageUrl);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                throw error;
+            }
         }
 
-      }
+        return imageUrls;
+    };
 
-      router.push("/");
-    } catch (error) {
-      console.error('Error:', error.message);
-    }
-  };
 
-  return (
-    <>
-      <h2 className="text-xl font-semibold p-4">Item For Sale</h2>
-      <form onSubmit={onSubmit} className="border rounded-lg p-4">
-        <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-slate-900/10 pb-12 md:grid-cols-2">
-          <div className="grid max-w-2xl grid-cols-1 gap-x-6  ">
-            {/* Product Name */}
-            <div className="sm:col-span-4">
-              <div className="flex flex-col gap-1 mt-2">
-                <span className="">Product Name</span>
-                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
-                  <input
-                    type="text"
-                    name="title"
-                    id="title"
-                    placeholder='Type here...'
-                    className="block flex-1 border-0 bg-transparent pl-0.5 px-0 py-1.5 text-slate-900 focus:ring-0 text-lg sm:leading-6"
-                    value={form.title}
-                    onChange={(e) => updateForm({ title: e.target.value })}
-                  />
+
+
+
+
+
+
+
+    // Function to upload images to S3 using pre-signed URLs
+
+    //   const uploadImagesToS3 = async (images) => {
+    //     const bucketName = process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME;
+    //     const imageUrls = [];
+    //     const region = process.env.NEXT_PUBLIC_AWS_REGION; // Ensure this is set
+
+
+    //     if (!bucketName || !region) {
+    //       throw new Error('Bucket name or region is not defined');
+    //     }
+
+    //     if (!Array.isArray(images)) {
+    //       throw new Error('Images parameter is not an array');
+    //     }
+
+    //     console.log('Type of images:', typeof images);
+    //     console.log('Is images an array?', Array.isArray(images));
+    //     console.log('Images content:', images);
+
+    //     try {
+    //       for (const file of images) {
+    //         if (!(file instanceof File)) {
+    //           throw new Error('Item in images array is not a File object');
+    //         }
+
+    //         const params = {
+    //           Bucket: bucketName,
+    //           Key: `items-images/${Date.now()}_${file.name}`,
+    //           Body: file,
+    //           ContentType: file.type,
+    //         };
+
+    //         const command = new PutObjectCommand(params);
+    //         await s3.send(command);
+
+    //         const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${params.Key}`;
+    //         imageUrls.push(imageUrl);
+    //       }
+    //     } catch (error) {
+    //       console.error('Error uploading images to S3:', error);
+    //       throw error;
+    //     }
+
+    //     return imageUrls;
+    //   };
+
+
+
+
+
+
+
+
+    // const fetchPresignedUrl = async (file) => {
+    //     // const response = await getFile(filename);
+    //     // const filename = file.name;
+    //     // const fileType = file.type;
+    //     // const response = await fetch(
+    //     //     `/api/get-presigned-url?file=${filename}&fileType=${fileType}`
+    //     //   );
+    //     // // if (!response.ok) {
+    //     // //   throw new Error('Error fetching presigned URL');
+    //     // // }
+    //     // const { url } = await response.json();
+    //     //   console.log(url);
+    //     // return url;
+
+    //     const presignedURL = new URL('/api/presigned', window.location.href);
+    //     presignedURL.searchParams.set('fileName', file.name);
+    //     presignedURL.searchParams.set('contentType', file.type);
+
+    //     fetch(presignedURL.toString())
+    //         .then((res) => res.json())
+    //         .then((res) => {
+    //             const url = res.signedUrl;
+    //             console.log('Presigned URL:', url);
+
+    //             // You can return the URL here or do whatever you need with it
+    //             return url;
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error fetching presigned URL:', error);
+    //         });
+    // };
+
+
+    // const uploadImagesToS3 = async (images) => {
+    //     const imageUrls = [];
+
+    //     try {
+    //         for (const file of images) {
+    //             console.log(file)
+    //             const presignedUrl = await fetchPresignedUrl(file);
+
+    //             //   console.log(presignedUrl)
+    //             const response = await fetch(presignedUrl, {
+    //                 method: 'PUT',
+    //                 body: file,
+    //                 headers: {
+    //                     'Content-Type': file.type,
+    //                 },
+    //             });
+
+    //             if (!response.ok) {
+    //                 throw new Error('Error uploading image');
+    //             }
+
+    //             // Construct the image URL
+    //             const imageUrl = presignedUrl.split('?')[0];
+    //             imageUrls.push(imageUrl);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error uploading images to S3:', error);
+    //         throw error;
+    //     }
+
+    //     return imageUrls;
+    // };
+
+
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        const newItem = { ...form };
+        try {
+            // Insert item data into Supabase
+            const { data, error } = await supabase
+                .from('items')
+                .insert(newItem)
+                .select();
+
+            if (error) throw error;
+
+            console.log(data)
+            const itemId = data[0].id; // Get the newly inserted item's ID
+            console.log(images.length)
+            // Handle image uploads
+            if (images.length > 0) {
+                console.log(images)
+                const imageUrls = await uploadImagesToS3(images);
+                console.log('Image URLs:', imageUrls);
+                const { error } = await supabase
+                    .from('items_images')
+                    .insert([{ item_id: itemId, image_url_arr: imageUrls }]);
+
+
+                if (error) {
+                    console.error('Error inserting image data:', error);
+                } else {
+                    console.log('Data inserted successfully');
+                }
+
+            }
+
+            router.push("/");
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+    };
+
+    return (
+        <>
+            <h2 className="text-xl font-semibold p-4">Item For Sale</h2>
+            <form onSubmit={onSubmit} className="border rounded-lg p-4">
+                <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-slate-900/10 pb-12 md:grid-cols-2">
+                    <div className="grid max-w-2xl grid-cols-1 gap-x-6  ">
+                        {/* Product Name */}
+                        <div className="sm:col-span-4">
+                            <div className="flex flex-col gap-1 mt-2">
+                                <span className="">Product Name</span>
+                                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
+                                    <input
+                                        type="text"
+                                        name="title"
+                                        id="title"
+                                        placeholder='Type here...'
+                                        className="block flex-1 border-0 bg-transparent pl-0.5 px-0 py-1.5 text-slate-900 focus:ring-0 text-lg sm:leading-6"
+                                        value={form.title}
+                                        onChange={(e) => updateForm({ title: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        {/* Price */}
+                        <div className="sm:col-span-4">
+                            <div className="flex flex-col gap-1 mt-2">
+                                <span className="">Price</span>
+
+                                <div className="flex sm:max-w-md border-solid border-2 border-black">
+
+                                    <span className="block flex border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6">$</span>
+                                    <input
+                                        type="number"
+                                        name="price"
+                                        id="price"
+                                        step="0.01"
+                                        min="0"
+                                        className="block flex-1 border-0 bg-transparent px-0 py-1.5 text-slate-900 focus:bg-gray-200 focus:ring-0 text-lg sm:leading-6 pl-0.5"
+                                        value={form.price}
+                                        onChange={(e) => updateForm({ price: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Description */}
+                        <div className="sm:col-span-4">
+                            <div className="flex flex-col gap-1 mt-2">
+                                <span className="">Description</span>
+                                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
+                                    <textarea
+                                        name="description"
+                                        id="description"
+                                        className="block w-full border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg h-32 sm:leading-6 resize-none"
+                                        placeholder="Description"
+                                        value={form.description}
+                                        onChange={(e) => updateForm({ description: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Location */}
+                        <div className="sm:col-span-4">
+                            <div className="flex flex-col gap-1 mt-2">
+                                <span className="">Location</span>
+                                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        id="location"
+                                        className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6"
+                                        placeholder="Location"
+                                        value={form.location}
+                                        onChange={(e) => updateForm({ location: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Category */}
+                        <div className="sm:col-span-4">
+                            <div className="relative flex flex-col">
+                                <label
+                                    htmlFor="category"
+                                    className="block text-sm font-medium leading-6 text-slate-900"
+                                >
+                                    Category
+                                </label>
+                                <div className="" ref={categoryDropdownRef}>
+                                    <div className="relative flex items-center">
+                                        <input
+                                            type="text"
+                                            value={categoryVal}
+                                            onChange={handleCategoryInputChange}
+                                            placeholder="Category"
+                                            className="flex-1 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600 p-3"
+                                            onFocus={() => setShowCategoryDropdown(true)}
+                                        />
+                                        <svg className="w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+
+
+                                    {showCategoryDropdown && filteredCategories.length > 0 && (
+                                        <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 shadow-lg overflow-y-auto max-h-32">
+                                            {filteredCategories.map((op, index) => (
+                                                <li
+                                                    key={index}
+                                                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                                    onClick={() => handleCategoryItemClick(op)}
+                                                >
+                                                    {op}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Condition */}
+                        <div className="sm:col-span-4">
+                            <div className="relative flex flex-col" ref={conditionDropdownRef}>
+                                <label
+                                    htmlFor="condition"
+                                    className="block text-sm font-medium leading-6 text-slate-900"
+                                >
+                                    Condition
+                                </label>
+                                <div className="relative flex items-center">
+                                    <input
+                                        type="text"
+                                        value={form.condition}
+                                        readOnly
+                                        placeholder="Condition"
+                                        className="flex-1 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600 p-3 cursor-pointer"
+                                        onClick={handleConditionToggleDropdown}
+                                    />
+                                    {showConditionDropdown && (
+                                        <ul className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 shadow-lg">
+                                            {conditions.map((condition, index) => (
+                                                <li
+                                                    key={index}
+                                                    onClick={() => handleConditionItemClick(condition)}
+                                                    className="p-2 cursor-pointer hover:bg-gray-200"
+                                                >
+                                                    {condition}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Images */}
+                        <div className="sm:col-span-4">
+                            <label
+                                htmlFor="images"
+                                className="block text-sm font-medium leading-6 text-slate-900"
+                            >
+                                Images
+                            </label>
+                            <input
+                                type="file"
+                                id="images"
+                                name="images"
+                                accept="image/*"
+                                multiple
+                                onChange={handleImageUpload}
+                                className="block mt-2"
+                            />
+                            <div className="mt-2">
+                                {images.map((image, index) => (
+                                    <div key={index} className="flex items-center mt-2">
+                                        <img
+                                            src={URL.createObjectURL(image)}
+                                            alt={`preview-${index}`}
+                                            className="w-20 h-20 object-cover"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleImageRemove(index)}
+                                            className="ml-2 text-red-500"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-            {/* Price */}
-            <div className="sm:col-span-4">
-              <div className="flex flex-col gap-1 mt-2">
-                <span className="">Price</span>
-
-                <div className="flex sm:max-w-md border-solid border-2 border-black">
-
-                  <span className="block flex border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6">$</span>
-                  <input
-                    type="number"
-                    name="price"
-                    id="price"
-                    step="0.01"
-                    min="0"
-                    className="block flex-1 border-0 bg-transparent px-0 py-1.5 text-slate-900 focus:bg-gray-200 focus:ring-0 text-lg sm:leading-6 pl-0.5"
-                    value={form.price}
-                    onChange={(e) => updateForm({ price: e.target.value })}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="sm:col-span-4">
-              <div className="flex flex-col gap-1 mt-2">
-                <span className="">Description</span>
-                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
-                  <textarea
-                    name="description"
-                    id="description"
-                    className="block w-full border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg h-32 sm:leading-6 resize-none"
-                    placeholder="Description"
-                    value={form.description}
-                    onChange={(e) => updateForm({ description: e.target.value })}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Location */}
-            <div className="sm:col-span-4">
-              <div className="flex flex-col gap-1 mt-2">
-                <span className="">Location</span>
-                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
-                  <input
-                    type="text"
-                    name="location"
-                    id="location"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6"
-                    placeholder="Location"
-                    value={form.location}
-                    onChange={(e) => updateForm({ location: e.target.value })}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Category */}
-            <div className="sm:col-span-4">
-              <div className="relative flex flex-col">
-                <label
-                  htmlFor="category"
-                  className="block text-sm font-medium leading-6 text-slate-900"
+                <button
+                    type="submit"
+                    className="block w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
-                  Category
-                </label>
-                <div className="" ref={categoryDropdownRef}>
-                  <div className="relative flex items-center">
-                    <input
-                      type="text"
-                      value={categoryVal}
-                      onChange={handleCategoryInputChange}
-                      placeholder="Category"
-                      className="flex-1 rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600 p-3"
-                      onFocus={() => setShowCategoryDropdown(true)}
-                    />
-                    <svg className="w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                  </div>
-
-
-                  {showCategoryDropdown && filteredCategories.length > 0 && (
-                    <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-y-auto max-h-32">
-                      {filteredCategories.map((op, index) => (
-                        <li
-                          key={index}
-                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                          onClick={() => handleCategoryItemClick(op)}
-                        >
-                          {op}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Condition */}
-            <div className="sm:col-span-4">
-              <div className="relative flex flex-col" ref={conditionDropdownRef}>
-                <label
-                  htmlFor="condition"
-                  className="block text-sm font-medium leading-6 text-slate-900"
-                >
-                  Condition
-                </label>
-                <div className="relative flex items-center">
-                  <input
-                    type="text"
-                    value={form.condition}
-                    readOnly
-                    placeholder="Condition"
-                    className="flex-1 rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600 p-3 cursor-pointer"
-                    onClick={handleConditionToggleDropdown}
-                  />
-                  {showConditionDropdown && (
-                    <ul className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                      {conditions.map((condition, index) => (
-                        <li
-                          key={index}
-                          onClick={() => handleConditionItemClick(condition)}
-                          className="p-2 cursor-pointer hover:bg-gray-200"
-                        >
-                          {condition}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Images */}
-            <div className="sm:col-span-4">
-              <label
-                htmlFor="images"
-                className="block text-sm font-medium leading-6 text-slate-900"
-              >
-                Images
-              </label>
-              <input
-                type="file"
-                id="images"
-                name="images"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-                className="block mt-2"
-              />
-              <div className="mt-2">
-                {images.map((image, index) => (
-                  <div key={index} className="flex items-center mt-2">
-                    <img
-                      src={URL.createObjectURL(image)}
-                      alt={`preview-${index}`}
-                      className="w-20 h-20 object-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleImageRemove(index)}
-                      className="ml-2 text-red-500"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-        <button
-          type="submit"
-          className="block w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          Submit
-        </button>
-      </form>
-    </>
-  );
+                    Submit
+                </button>
+            </form>
+        </>
+    );
 };
 
 export default CreateItem;
