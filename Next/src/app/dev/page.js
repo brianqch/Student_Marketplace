@@ -665,7 +665,7 @@ const CreateItem = ({ params }) => {
                                         onClick={handleConditionToggleDropdown}
                                     />
                                     {showConditionDropdown && (
-                                        <ul className="absolute top-full left-0 w-full  mt-1 bg-white border border-gray-300 shadow-lg">
+                                        <ul className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 shadow-lg z-10">
                                             {conditions.map((condition, index) => (
                                                 <li
                                                     key={index}
@@ -685,7 +685,7 @@ const CreateItem = ({ params }) => {
                         <div className="sm:col-span-4">
                             <label
                                 htmlFor="images"
-                                className="block text-sm font-medium leading-6 text-slate-900"
+                                className="block text-md leading-6 mt-2  text-slate-900"
                             >
                                 Images
                             </label>
@@ -698,7 +698,7 @@ const CreateItem = ({ params }) => {
                                 onChange={handleImageUpload}
                                 className="block mt-2"
                             />
-                            <div className="mt-2 flex flex-wrap gap-2">
+                            <div className="flex flex-wrap mt-4 gap-2">
                                 {images.map((image, index) => (
                                     <div key={index} className="relative">
                                         <img
