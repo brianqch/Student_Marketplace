@@ -139,7 +139,7 @@
 //       </div>
 //       <div className="relative z-10 p-8 text-center text-white">
 //         <h1 className="text-3xl font-bold">Your Content</h1>
-//         <p className="text-lg">Some description or other content.</p>
+//         <p className="text-md">Some description or other content.</p>
 //       </div>
 
 //     </>
@@ -524,7 +524,7 @@ const CreateItem = ({ params }) => {
 
     return (
         <>
-            <h2 className="text-xl font-semibold p-4">Item For Sale</h2>
+            <h2 className="text-xl font-semibold p-4">Product Listing</h2>
             <form onSubmit={onSubmit} className="border rounded-lg p-4">
                 <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-slate-900/10 pb-12 md:grid-cols-2">
                     <div className="grid max-w-2xl grid-cols-1 gap-x-6  ">
@@ -534,13 +534,13 @@ const CreateItem = ({ params }) => {
                         <div className="sm:col-span-4">
                             <div className="flex flex-col gap-1 mt-2">
                                 <span className="">Product Name</span>
-                                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
+                                <div className="flex sm:max-w-md border-solid border-2 border-black">
                                     <input
                                         type="text"
                                         name="title"
                                         id="title"
-                                        placeholder='Type here...'
-                                        className="block flex-1 border-0 bg-transparent pl-0.5 px-0 py-1.5 text-slate-900 focus:ring-0 text-lg sm:leading-6"
+                                        placeholder="e.g. Brand New Couch"
+                                        className="block flex-1 border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus-within:ring-uni-blue text-md sm:leading-6"
                                         value={form.title}
                                         onChange={(e) => updateForm({ title: e.target.value })}
                                     />
@@ -550,24 +550,25 @@ const CreateItem = ({ params }) => {
                         {/* Price */}
                         <div className="sm:col-span-4">
                             <div className="flex flex-col gap-1 mt-2">
-                                <span className="">Price</span>
-
-                                <div className="flex sm:max-w-md border-solid border-2 border-black">
-
-                                    <span className="block flex border-0 bg-transparent py-1.5 pl-1.5 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6">$</span>
+                                <label htmlFor="price" className="text-sm font-medium text-slate-900">Price</label>
+                                <div className="relative flex sm:max-w-md border-solid border-2 border-black">
                                     <input
                                         type="number"
                                         name="price"
+                                        placeholder="Enter price"
                                         id="price"
-                                        step="0.01"
                                         min="0"
-                                        className="block flex-1 border-0 bg-transparent pl-1 py-1.5 text-slate-900 focus:bg-gray-200 focus:ring-0 text-lg sm:leading-6 pl-0.5"
+                                        className="block flex-1 border-0 bg-transparent pl-6 p-3 text-slate-900 text-md sm:leading-6 focus:ring-4 focus-within:ring-uni-blue"
                                         value={form.price}
                                         onChange={(e) => updateForm({ price: e.target.value })}
                                     />
+                                    <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-2">
+                                        <span className="text-md text-slate-900">$</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
 
                         {/* Description */}
                         <div className="sm:col-span-4">
@@ -577,8 +578,8 @@ const CreateItem = ({ params }) => {
                                     <textarea
                                         name="description"
                                         id="description"
-                                        className="block w-full border-0 bg-transparent pl-2 p-3 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg h-32 sm:leading-6 resize-none"
-                                        placeholder="Description"
+                                        className="block w-full border-0 bg-transparent pl-2 p-3 text-slate-900  focus:ring-4 focus:ring-uni-blue text-md h-32 sm:leading-6 resize-none"
+                                        placeholder="Describe the item, condition, and any special features..."
                                         value={form.description}
                                         onChange={(e) => updateForm({ description: e.target.value })}
                                     />
@@ -595,8 +596,8 @@ const CreateItem = ({ params }) => {
                                         type="text"
                                         name="location"
                                         id="location"
-                                        className="block flex-1 border-0 bg-transparent pl-2 p-3 text-slate-900 placeholder:text-slate-400 placeholder:text-lg focus:ring-0 text-lg sm:leading-6"
-                                        placeholder="Location"
+                                        className="block flex-1 border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus:ring-uni-blue text-md sm:leading-6"
+                                        placeholder="Northside, southside, etc."
                                         value={form.location}
                                         onChange={(e) => updateForm({ location: e.target.value })}
                                     />
@@ -620,10 +621,10 @@ const CreateItem = ({ params }) => {
                                             value={categoryVal}
                                             onChange={handleCategoryInputChange}
                                             placeholder="Category"
-                                            className="flex-1 shadow-sm  border-2 border-black focus:ring-2 focus:ring-indigo-600 p-3"
-                                            onFocus={() => setShowCategoryDropdown(true)}
+                                            className="flex-1 shadow-sm text-md border-2 border-black focus:ring-2 focus:ring-uni-blue p-3 cursor-pointer"
+                                            onClick={() => setShowCategoryDropdown(true)}
                                         />
-                                        <svg className="w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <svg className="z-0 w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2 hover:cursor-pointer" fill="none" onClick={() => setShowCategoryDropdown(true)} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                                         </svg>
                                     </div>
@@ -634,7 +635,7 @@ const CreateItem = ({ params }) => {
                                             {filteredCategories.map((op, index) => (
                                                 <li
                                                     key={index}
-                                                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                                    className="px-4 py-2 text-md hover:bg-gray-100 cursor-pointer"
                                                     onClick={() => handleCategoryItemClick(op)}
                                                 >
                                                     {op}
@@ -647,7 +648,7 @@ const CreateItem = ({ params }) => {
                         </div>
 
                         {/* Condition */}
-                        <div className="sm:col-span-4 max-w-md">
+                        <div className="sm:col-span-4 max-w-md ">
                             <div className="relative flex flex-col gap-1 mt-2" ref={conditionDropdownRef}>
                                 <label
                                     htmlFor="condition"
@@ -655,22 +656,25 @@ const CreateItem = ({ params }) => {
                                 >
                                     Condition
                                 </label>
-                                <div className="relative flex items-center">
+                                <div className="relative flex items-center" >
                                     <input
                                         type="text"
                                         value={form.condition}
                                         readOnly
                                         placeholder="Condition"
-                                        className="flex-1 shadow-sm border-2 border-black focus:ring-2 focus:ring-indigo-600 p-3 cursor-pointer"
+                                        className="flex-1 shadow-sm border-2 border-black focus:ring-2 focus:ring-uni-blue p-3 cursor-pointer  text-md"
                                         onClick={handleConditionToggleDropdown}
                                     />
+                                    <svg className="z-0 w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2 hover:cursor-pointer" fill="none" onClick={handleConditionToggleDropdown} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                     {showConditionDropdown && (
                                         <ul className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 shadow-lg z-10">
                                             {conditions.map((condition, index) => (
                                                 <li
                                                     key={index}
                                                     onClick={() => handleConditionItemClick(condition)}
-                                                    className="p-2 cursor-pointer hover:bg-gray-200"
+                                                    className="p-2 cursor-pointer text-md hover:bg-gray-200"
                                                 >
                                                     {condition}
                                                 </li>
