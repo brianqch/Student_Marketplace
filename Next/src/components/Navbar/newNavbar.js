@@ -68,7 +68,7 @@ export default function NewNavbar() {
           
   
           {/* Right */}
-          <div className="flex items-center space-x-4">
+          <div className="items-center space-x-4 hidden sm:flex">
             {user ? (
               <>
                 <Link href="/notifications" className="">
@@ -83,7 +83,8 @@ export default function NewNavbar() {
                 {/* Divider */}
                 <div className="h-7 border-l-2 border-gray-300 mx-2"></div> 
                 {/* Divider */}
-                <button className="border-2 border-slate-950 bg-[#432d2d] p-2 text-white">SELL NOW</button>
+                <button className="border-2 border-slate-950 bg-[#432d2d] p-2 text-white text-sm sm:text-base min-w-[100px]">SELL NOW</button>
+
 
 
                 {/* <Link href="/dev" className="hover:text-indigo-600 text-gray-700">Dev</Link>
