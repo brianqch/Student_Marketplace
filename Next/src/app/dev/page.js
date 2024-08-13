@@ -166,12 +166,8 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
-import s3 from '../../lib/aws'; // Import the configured S3 instance
 import supabase from '../../lib/supabase'; // Ensure you have Supabase client configured
-// import { v4 as uuidv4 } from 'uuid'; // To generate unique IDs for S3 keys
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import imageCompression from 'browser-image-compression'; // Import the image compression library
-import { NextResponse } from 'next/server';
 
 const CreateItem = ({ params }) => {
     const [form, setForm] = useState({
@@ -180,8 +176,11 @@ const CreateItem = ({ params }) => {
         location: "",
         category: "",
         condition: "",
-        description: ""
+        description: "",
+        brand: ""
     });
+    const fileInputRef = useRef(null);
+    const [selectedImage, setSelectedImage] = useState(null); // State for the selected image
     const [images, setImages] = useState([]);
     const [categoryVal, setCategoryVal] = useState('');
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
@@ -270,25 +269,31 @@ const CreateItem = ({ params }) => {
         setForm(prev => ({ ...prev, ...value }));
     }
 
-    const handleImageUpload = async (e) => {
+    const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
-        // Compress new files
-        const compressedFiles = await Promise.all(
-            files.map(file => compressImage(file))
-        );
-        // Merge new compressed files with existing images
-        setImages(prevImages => [...prevImages, ...compressedFiles]);
+        setImages((prevImages) => [...prevImages, ...files]);
+        fileInputRef.current.value = null;
+        if (files.length > 0) {
+            setSelectedImage(URL.createObjectURL(files[0])); // Set the first uploaded image as selected
+        }
     };
+
+    const handleThumbnailClick = (image) => {
+        setSelectedImage(URL.createObjectURL(image));
+    };
+
 
     const compressImage = async (file) => {
         const options = {
-            maxSizeMB: 1, // Maximum size in MB
+            maxSizeMB: 0.7, // Maximum size in MB
             maxWidthOrHeight: 800, // Maximum width or height
             useWebWorker: true, // Use web workers for faster compression
         };
         try {
             const compressedBlob = await imageCompression(file, options);
             const compressedFile = new File([compressedBlob], file.name, { type: file.type });
+
+            console.log("Compressed")
             return compressedFile;
         } catch (error) {
             console.error("Error compressing image:", error);
@@ -297,13 +302,19 @@ const CreateItem = ({ params }) => {
     };
 
     const handleImageRemove = (index) => {
-        setImages(images.filter((_, i) => i !== index));
+
+        setImages((prevImages) => {
+            const updatedImages = [...prevImages];
+            updatedImages.splice(index, 1);
+            console.log(updatedImages)
+            if (updatedImages.length > 0) {
+                setSelectedImage(URL.createObjectURL(updatedImages[updatedImages.length - 1])); // Select the last image
+            } else {
+                setSelectedImage(null); // No images left, clear selection
+            }
+            return updatedImages;
+        });
     };
-
-
-
-
-
 
 
     const getPresignedUrl = async (fileName, contentType, timestamp) => {
@@ -356,138 +367,10 @@ const CreateItem = ({ params }) => {
         return imageUrls;
     };
 
-
-
-
-
-
-
-
-
-    // Function to upload images to S3 using pre-signed URLs
-
-    //   const uploadImagesToS3 = async (images) => {
-    //     const bucketName = process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME;
-    //     const imageUrls = [];
-    //     const region = process.env.NEXT_PUBLIC_AWS_REGION; // Ensure this is set
-
-
-    //     if (!bucketName || !region) {
-    //       throw new Error('Bucket name or region is not defined');
-    //     }
-
-    //     if (!Array.isArray(images)) {
-    //       throw new Error('Images parameter is not an array');
-    //     }
-
-    //     console.log('Type of images:', typeof images);
-    //     console.log('Is images an array?', Array.isArray(images));
-    //     console.log('Images content:', images);
-
-    //     try {
-    //       for (const file of images) {
-    //         if (!(file instanceof File)) {
-    //           throw new Error('Item in images array is not a File object');
-    //         }
-
-    //         const params = {
-    //           Bucket: bucketName,
-    //           Key: `items-images/${Date.now()}_${file.name}`,
-    //           Body: file,
-    //           ContentType: file.type,
-    //         };
-
-    //         const command = new PutObjectCommand(params);
-    //         await s3.send(command);
-
-    //         const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${params.Key}`;
-    //         imageUrls.push(imageUrl);
-    //       }
-    //     } catch (error) {
-    //       console.error('Error uploading images to S3:', error);
-    //       throw error;
-    //     }
-
-    //     return imageUrls;
-    //   };
-
-
-
-
-
-
-
-
-    // const fetchPresignedUrl = async (file) => {
-    //     // const response = await getFile(filename);
-    //     // const filename = file.name;
-    //     // const fileType = file.type;
-    //     // const response = await fetch(
-    //     //     `/api/get-presigned-url?file=${filename}&fileType=${fileType}`
-    //     //   );
-    //     // // if (!response.ok) {
-    //     // //   throw new Error('Error fetching presigned URL');
-    //     // // }
-    //     // const { url } = await response.json();
-    //     //   console.log(url);
-    //     // return url;
-
-    //     const presignedURL = new URL('/api/presigned', window.location.href);
-    //     presignedURL.searchParams.set('fileName', file.name);
-    //     presignedURL.searchParams.set('contentType', file.type);
-
-    //     fetch(presignedURL.toString())
-    //         .then((res) => res.json())
-    //         .then((res) => {
-    //             const url = res.signedUrl;
-    //             console.log('Presigned URL:', url);
-
-    //             // You can return the URL here or do whatever you need with it
-    //             return url;
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error fetching presigned URL:', error);
-    //         });
-    // };
-
-
-    // const uploadImagesToS3 = async (images) => {
-    //     const imageUrls = [];
-
-    //     try {
-    //         for (const file of images) {
-    //             console.log(file)
-    //             const presignedUrl = await fetchPresignedUrl(file);
-
-    //             //   console.log(presignedUrl)
-    //             const response = await fetch(presignedUrl, {
-    //                 method: 'PUT',
-    //                 body: file,
-    //                 headers: {
-    //                     'Content-Type': file.type,
-    //                 },
-    //             });
-
-    //             if (!response.ok) {
-    //                 throw new Error('Error uploading image');
-    //             }
-
-    //             // Construct the image URL
-    //             const imageUrl = presignedUrl.split('?')[0];
-    //             imageUrls.push(imageUrl);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error uploading images to S3:', error);
-    //         throw error;
-    //     }
-
-    //     return imageUrls;
-    // };
-
-
     const onSubmit = async (e) => {
         e.preventDefault();
         const newItem = { ...form };
+
         try {
             // Insert item data into Supabase
             const { data, error } = await supabase
@@ -497,9 +380,14 @@ const CreateItem = ({ params }) => {
 
             if (error) throw error;
 
+            const compressedImages = await Promise.all(
+                images.map(file => compressImage(file))
+            );
+
+            setImages(compressedImages);
+
             console.log(data)
             const itemId = data[0].id; // Get the newly inserted item's ID
-            console.log(images.length)
             // Handle image uploads
             if (images.length > 0) {
                 console.log(images)
@@ -525,42 +413,40 @@ const CreateItem = ({ params }) => {
     };
 
     return (
-        <>
+        <div>
             <h2 className="text-xl font-semibold p-4">Product Listing</h2>
-            <form onSubmit={onSubmit} className="border rounded-lg p-4">
-                <div className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-slate-900/10 pb-12 md:grid-cols-2">
-                    <div className="grid max-w-2xl grid-cols-1 gap-x-6  ">
-
-
+            <form onSubmit={onSubmit} className="p-6">
+                <div className="flex flex-col md:flex-row gap-8 justify-center">
+                    {/* Details Section */}
+                    <div className="flex flex-col w-full max-w-2xl md:w-3/4 gap-4">
                         {/* Product Name */}
-                        <div className="sm:col-span-4">
-                            <div className="flex flex-col gap-1 mt-2">
-                                <span className="">Product Name</span>
-                                <div className="flex sm:max-w-md border-solid border-2 border-black">
-                                    <input
-                                        type="text"
-                                        name="title"
-                                        id="title"
-                                        placeholder="e.g. Brand New Couch"
-                                        className="block flex-1 border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus-within:ring-uni-blue text-md sm:leading-6"
-                                        value={form.title}
-                                        onChange={(e) => updateForm({ title: e.target.value })}
-                                    />
-                                </div>
+                        <div className="flex flex-col gap-1">
+                            <span>Product Name</span>
+                            <div className="flex border-2  border-slate-400">
+                                <input
+                                    type="text"
+                                    name="title"
+                                    id="title"
+                                    placeholder="e.g. Brand New Couch"
+                                    className="block flex-1 border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus-within:ring-uni-blue text-md"
+                                    value={form.title}
+                                    onChange={(e) => updateForm({ title: e.target.value })}
+                                />
                             </div>
                         </div>
-                        {/* Price */}
-                        <div className="sm:col-span-4">
-                            <div className="flex flex-col gap-1 mt-2">
-                                <label htmlFor="price" className="text-sm font-medium text-slate-900">Price</label>
-                                <div className="relative flex sm:max-w-md border-solid border-2 border-black">
+
+                        <div className="flex flex-row justify-between gap-2">
+                            {/* Price */}
+                            <div className="flex flex-col w-1/3 gap-1">
+                                <label htmlFor="price" className="text-md text-slate-900">Price</label>
+                                <div className="relative flex border-2   border-slate-400 ">
                                     <input
                                         type="number"
                                         name="price"
                                         placeholder="Enter price"
                                         id="price"
                                         min="0"
-                                        className="block flex-1 border-0 bg-transparent pl-6 p-3 text-slate-900 text-md sm:leading-6 focus:ring-4 focus-within:ring-uni-blue"
+                                        className="w-3/4 flex-1 border-0 bg-transparent pl-6 p-3 text-slate-900 text-md focus:ring-4 focus-within:ring-uni-blue"
                                         value={form.price}
                                         onChange={(e) => updateForm({ price: e.target.value })}
                                     />
@@ -569,173 +455,238 @@ const CreateItem = ({ params }) => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-
-                        {/* Description */}
-                        <div className="sm:col-span-4">
-                            <div className="flex flex-col gap-1 mt-2">
-                                <span className="">Description</span>
-                                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
-                                    <textarea
-                                        name="description"
-                                        id="description"
-                                        className="block w-full border-0 bg-transparent pl-2 p-3 text-slate-900  focus:ring-4 focus:ring-uni-blue text-md h-32 sm:leading-6 resize-none"
-                                        placeholder="Describe the item, condition, and any special features..."
-                                        value={form.description}
-                                        onChange={(e) => updateForm({ description: e.target.value })}
+                            {/* Brand */}
+                            <div className="flex flex-col w-2/3 gap-1">
+                                <span>Brand</span>
+                                <div className="relative border-2  border-slate-400">
+                                    <input
+                                        type="text"
+                                        name="brand"
+                                        id="brand"
+                                        placeholder="e.g. IKEA"
+                                        className="block flex-1 border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus-within:ring-uni-blue text-md"
+                                        value={form.brand}
+                                        onChange={(e) => updateForm({ brand: e.target.value })}
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Location */}
-                        <div className="sm:col-span-4">
-                            <div className="flex flex-col gap-1 mt-2">
-                                <span className="">Location</span>
-                                <div className="flex sm:max-w-md border-solid border-2 border-black pl-0.5">
+                        <div className="flex flex-col sm:flex-row justify-between gap-2">
+                            {/* Category */}
+                            <div className="sm:col-span-4 w-full sm:w-1/3">
+                                <div className="relative flex flex-col gap-1">
+                                    <label
+                                        htmlFor="category"
+                                        className="block text-md leading-6 text-slate-900"
+                                    >
+                                        Category
+                                    </label>
+                                    <div className="" ref={categoryDropdownRef}>
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type="text"
+                                                value={categoryVal}
+                                                onChange={handleCategoryInputChange}
+                                                placeholder="Category"
+                                                className="flex-1 shadow-sm text-md border-2   border-slate-400 focus:ring-2 focus:ring-uni-blue p-3 cursor-pointer"
+                                                onClick={() => setShowCategoryDropdown(true)}
+                                            />
+                                            <svg className="z-0 w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2 hover:cursor-pointer" fill="none" onClick={() => setShowCategoryDropdown(true)} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </div>
+
+
+                                        {showCategoryDropdown && filteredCategories.length > 0 && (
+                                            <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 shadow-lg overflow-y-auto max-h-32">
+                                                {filteredCategories.map((op, index) => (
+                                                    <li
+                                                        key={index}
+                                                        className="px-4 py-2 text-md hover:bg-gray-100 cursor-pointer"
+                                                        onClick={() => handleCategoryItemClick(op)}
+                                                    >
+                                                        {op}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Condition */}
+                            <div className="sm:col-span-4 w-full sm:w-1/3">
+                                <div className="relative flex flex-col gap-1" ref={conditionDropdownRef}>
+                                    <label
+                                        htmlFor="condition"
+                                        className="block text-md leading-6 text-slate-900"
+                                    >
+                                        Condition
+                                    </label>
+                                    <div className="relative flex items-center" >
+                                        <input
+                                            type="text"
+                                            value={form.condition}
+                                            readOnly
+                                            placeholder="Condition"
+                                            className="flex-1 shadow-sm border-2   border-slate-400 focus:ring-2 focus:ring-uni-blue p-3 cursor-pointer  text-md"
+                                            onClick={handleConditionToggleDropdown}
+                                        />
+                                        <svg className="z-0 w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2 hover:cursor-pointer" fill="none" onClick={handleConditionToggleDropdown} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                        {showConditionDropdown && (
+                                            <ul className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 shadow-lg z-10">
+                                                {conditions.map((condition, index) => (
+                                                    <li
+                                                        key={index}
+                                                        onClick={() => handleConditionItemClick(condition)}
+                                                        className="p-2 cursor-pointer text-md hover:bg-gray-200"
+                                                    >
+                                                        {condition}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Region */}
+                            <div className="flex flex-col gap-1 w-full sm:w-1/3">
+                                <span>Region</span>
+                                <div className="flex border-2 border-slate-400 ">
                                     <input
                                         type="text"
                                         name="location"
                                         id="location"
-                                        className="block flex-1 border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus:ring-uni-blue text-md sm:leading-6"
+                                        className="block flex-1 border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus:ring-uni-blue text-md"
                                         placeholder="Northside, southside, etc."
                                         value={form.location}
                                         onChange={(e) => updateForm({ location: e.target.value })}
                                     />
                                 </div>
                             </div>
+
                         </div>
 
-                        {/* Category */}
-                        <div className="sm:col-span-4 max-w-md">
-                            <div className="relative flex flex-col gap-1 mt-2">
-                                <label
-                                    htmlFor="category"
-                                    className="block text-md leading-6 text-slate-900"
-                                >
-                                    Category
-                                </label>
-                                <div className="" ref={categoryDropdownRef}>
-                                    <div className="relative flex items-center">
-                                        <input
-                                            type="text"
-                                            value={categoryVal}
-                                            onChange={handleCategoryInputChange}
-                                            placeholder="Category"
-                                            className="flex-1 shadow-sm text-md border-2 border-black focus:ring-2 focus:ring-uni-blue p-3 cursor-pointer"
-                                            onClick={() => setShowCategoryDropdown(true)}
-                                        />
-                                        <svg className="z-0 w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2 hover:cursor-pointer" fill="none" onClick={() => setShowCategoryDropdown(true)} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                    </div>
-
-
-                                    {showCategoryDropdown && filteredCategories.length > 0 && (
-                                        <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 shadow-lg overflow-y-auto max-h-32">
-                                            {filteredCategories.map((op, index) => (
-                                                <li
-                                                    key={index}
-                                                    className="px-4 py-2 text-md hover:bg-gray-100 cursor-pointer"
-                                                    onClick={() => handleCategoryItemClick(op)}
-                                                >
-                                                    {op}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
+                        {/* Description */}
+                        <div className="flex flex-col gap-1">
+                            <span>Description</span>
+                            <div className="flex border-2  border-slate-400 ">
+                                <textarea
+                                    name="description"
+                                    id="description"
+                                    className="block w-full border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus:ring-uni-blue text-md h-44 resize-none"
+                                    placeholder="Describe the item, condition, and any special features..."
+                                    value={form.description}
+                                    onChange={(e) => updateForm({ description: e.target.value })}
+                                />
                             </div>
                         </div>
 
-                        {/* Condition */}
-                        <div className="sm:col-span-4 max-w-md ">
-                            <div className="relative flex flex-col gap-1 mt-2" ref={conditionDropdownRef}>
-                                <label
-                                    htmlFor="condition"
-                                    className="block text-md leading-6 text-slate-900"
-                                >
-                                    Condition
-                                </label>
-                                <div className="relative flex items-center" >
-                                    <input
-                                        type="text"
-                                        value={form.condition}
-                                        readOnly
-                                        placeholder="Condition"
-                                        className="flex-1 shadow-sm border-2 border-black focus:ring-2 focus:ring-uni-blue p-3 cursor-pointer  text-md"
-                                        onClick={handleConditionToggleDropdown}
-                                    />
-                                    <svg className="z-0 w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2 hover:cursor-pointer" fill="none" onClick={handleConditionToggleDropdown} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                    {showConditionDropdown && (
-                                        <ul className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 shadow-lg z-10">
-                                            {conditions.map((condition, index) => (
-                                                <li
-                                                    key={index}
-                                                    onClick={() => handleConditionItemClick(condition)}
-                                                    className="p-2 cursor-pointer text-md hover:bg-gray-200"
-                                                >
-                                                    {condition}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Images */}
-                        <div className="sm:col-span-4">
-                            <label
-                                htmlFor="images"
-                                className="block text-md leading-6 mt-2  text-slate-900"
+                        {/* Submit Button */}
+                        <div className="flex mt-auto">
+                            <button
+                                type="submit"
+                                className="px-4 py-2 bg-uni-blue text-white border-2 border-black hover:bg-blue-500 transition-colors duration-100hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                Images
-                            </label>
-                            <input
-                                type="file"
-                                id="images"
-                                name="images"
-                                accept="image/*"
-                                multiple
-                                onChange={handleImageUpload}
-                                className="block mt-2"
-                            />
-                            <div className="flex flex-wrap mt-4 gap-2">
-                                {images.map((image, index) => (
-                                    <div key={index} className="relative">
-                                        <img
-                                            src={URL.createObjectURL(image)}
-                                            alt={`preview-${index}`}
-                                            className="w-20 h-20 object-cover"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => handleImageRemove(index)}
-                                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center"
-                                        >
-                                            &times;
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-
+                                Submit
+                            </button>
                         </div>
 
                     </div>
+
+                    <div>
+                        {/* Images */}
+                        <div className="sm:col-span-4 gap-1">
+                            <label
+                                htmlFor="images"
+                                className="block text-md leading-"
+                            >
+                                Upload Images
+                            </label>
+                            <div className="flex flex-col sm:flex-row justify-start gap-2">
+                                <div className="relative aspect-square w-[25vw] max-w-[700px] max-h-[700px] bg-gray-100 border border-gray-300 flex items-center justify-center">
+                                    <input
+                                        type="file"
+                                        id="images"
+                                        name="images"
+                                        accept="image/*"
+                                        multiple
+                                        onChange={handleImageUpload}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        ref={fileInputRef}
+                                    />
+                                    {selectedImage ? (
+                                        <img
+                                            src={selectedImage}
+                                            alt="preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="text-center">
+                                            <div className="text-5xl text-gray-400">
+                                                <span className="plus-sign">+</span>
+                                            </div>
+                                            <p className="text-gray-500 mt-2">Upload Image</p>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex flex-row sm:flex-col">
+                                    {(images.length > 0) ? (
+                                        <div className="flex flex-row sm:flex-col ml-4 gap-2">
+                                            {images.map((image, index) => (
+                                                <div key={index} className="relative w-20 h-20">
+                                                    <img
+                                                        src={URL.createObjectURL(image)}
+                                                        alt={`preview-${index}`}
+                                                        className="w-full h-full aspect-square object-cover hover:cursor-pointer"
+                                                        onClick={() => handleThumbnailClick(image)} // Update preview on click
+
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleImageRemove(index)}
+                                                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center"
+                                                    >
+                                                        &times;
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            <button
+                                                type="button"
+                                                onClick={() => document.getElementById('images').click()}
+                                                className="relative w-20 h-20 bg-gray-100 border border-gray-300 flex items-center justify-center text-2xl text-gray-500"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={() => document.getElementById('images').click()}
+                                            className="relative w-20 h-20 bg-gray-100 border border-gray-300 flex items-center justify-center text-2xl text-gray-500"
+                                        >
+                                            +
+                                        </button>
+                                    )}
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button
-                    type="submit"
-                    className="block w-full mt-4 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                    Submit
-                </button>
+
+
             </form>
-        </>
+        </div>
     );
+
+
 };
 
 export default CreateItem;
