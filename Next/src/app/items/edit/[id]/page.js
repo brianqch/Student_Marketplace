@@ -129,13 +129,15 @@ const EditItem = ({ params }) => {
     async function onSubmit(e) {
         e.preventDefault();
         const updatedItem = { ...form };
-    
+        console.log("New", updatedItem)
+        console.log("id", id)
         try {
-          const { error } = await supabase
+          const {error } = await supabase
             .from('items')
             .update(updatedItem)
             .eq('id', id);
-    
+            
+
           if (error) {
             throw error;
           }

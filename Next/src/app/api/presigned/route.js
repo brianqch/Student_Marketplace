@@ -18,8 +18,6 @@ export async function GET(request) {
   const contentType = searchParams.get('contentType');
   const timestamp = searchParams.get('timestamp');
 
-  console.log("time", timestamp)
-
   if (!fileName || !contentType) {
     return new Response(null, { status: 400 });
   }

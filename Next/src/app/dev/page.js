@@ -166,14 +166,11 @@
 "use client";
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
-import s3 from '../../lib/aws'; // Import the configured S3 instance
 import supabase from '../../lib/supabase'; // Ensure you have Supabase client configured
 // import { v4 as uuidv4 } from 'uuid'; // To generate unique IDs for S3 keys
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import imageCompression from 'browser-image-compression'; // Import the image compression library
-import { NextResponse } from 'next/server';
 
-const CreateItem = ({ params }) => {
+const CreateItem = () => {
     const [form, setForm] = useState({
         title: "",
         price: "",
@@ -182,13 +179,18 @@ const CreateItem = ({ params }) => {
         condition: "",
         description: ""
     });
+    // Store images to upload
     const [images, setImages] = useState([]);
+
+    // Router for transferring pages
+    const router = useRouter();
+
+    // Category and condition variables
     const [categoryVal, setCategoryVal] = useState('');
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const [showConditionDropdown, setShowConditionDropdown] = useState(false);
-
-    const router = useRouter();
-    const { id } = params;
+    const categoryDropdownRef = useRef(null);
+    const conditionDropdownRef = useRef(null);
     const conditions = ["New", "Used - Like New", "Used - Good", "Used - Fair"];
     const categories = [
         "Antiques & Collectibles",
@@ -213,14 +215,12 @@ const CreateItem = ({ params }) => {
         "Video Games & Consoles"
     ];
 
-    const categoryDropdownRef = useRef(null);
-    const conditionDropdownRef = useRef(null);
-
-
+    // Filtering for the different categories
     const filteredCategories = categories.filter((item) =>
         item.toLowerCase().includes(form.category.toLowerCase())
     );
 
+     // To detect clicks and change inside for category
     const handleCategoryInputChange = (e) => {
         form.category = e.target.value;
         setCategoryVal(e.target.value);
@@ -233,6 +233,7 @@ const CreateItem = ({ params }) => {
         setShowCategoryDropdown(false);
     };
 
+    // To detect clicks inside for condition
     const handleConditionToggleDropdown = () => {
         setShowConditionDropdown((prev) => !prev);
     };
@@ -242,6 +243,7 @@ const CreateItem = ({ params }) => {
         setShowConditionDropdown(false);
     };
 
+    // To detect clicks outside for category and condition
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -265,11 +267,12 @@ const CreateItem = ({ params }) => {
         };
     }, []);
 
-
+    // Updating the form with new values
     function updateForm(value) {
         setForm(prev => ({ ...prev, ...value }));
     }
 
+    // Process to update images, compress for better storage, and remove if necessary
     const handleImageUpload = async (e) => {
         const files = Array.from(e.target.files);
         // Compress new files
@@ -300,12 +303,7 @@ const CreateItem = ({ params }) => {
         setImages(images.filter((_, i) => i !== index));
     };
 
-
-
-
-
-
-
+    // Functions to help get presigned url to upload images to AWS s3 bucket
     const getPresignedUrl = async (fileName, contentType, timestamp) => {
         const response = await fetch(`/api/presigned?fileName=${encodeURIComponent(fileName)}&contentType=${encodeURIComponent(contentType)}&timestamp=${encodeURIComponent(timestamp)}`);
         const data = await response.json();
@@ -327,7 +325,7 @@ const CreateItem = ({ params }) => {
                 const timestamp = Date.now();
                 // Get a pre-signed URL from your server
                 const presignedUrl = await getPresignedUrl(fileName, contentType, timestamp);
-                console.log("presignedUrl", presignedUrl)
+                // console.log("presignedUrl", presignedUrl)
                 // Upload the file using the pre-signed URL
                 const response = await fetch(presignedUrl, {
                     method: 'PUT',
