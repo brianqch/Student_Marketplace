@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useQuery } from "react-query";
+// import axios from 'axios';
 import {
     Dialog,
     DialogBackdrop,
@@ -16,6 +18,7 @@ import {
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid'
 import ProductCard from './ProductCard'; // Adjust the path as needed
+import ProductList from './ProductList';
 import supabase from '../../lib/supabase'; // Adjust the path as needed
 
 
@@ -28,15 +31,16 @@ const sortOptions = [
     { name: 'Price: High to Low', href: '#', current: false },
 ]
 const subCategories = [
-    { name: 'All', href: '#' },
-    { name: 'Clothes', href: '#' },
-    { name: 'Electronics', href: '#' },
-    { name: 'Appliances', href: '#' },
-    { name: 'Furniture', href: '#' },
-    { name: 'Household', href: '#' },
-    { name: 'School Supplies', href: '#' },
-    { name: 'Books', href: '#' },
-]
+    { name: 'All', href: '/shop' },
+    { name: 'Clothes', href: '/shop/clothes' },
+    { name: 'Electronics', href: '/shop/electronics' },
+    { name: 'Appliances', href: '/shop/appliances' },
+    { name: 'Furniture', href: '/shop/furniture' },
+    { name: 'Household', href: '/shop/household' },
+    { name: 'School Supplies', href: '/shop/school-supplies' },
+    { name: 'Books', href: '/shop/books' },
+];
+
 const filters = [
     {
         id: 'price',
@@ -89,9 +93,11 @@ function classNames(...classes) {
 }
 
 
-export default function FilterMenu({ }) {
+export default function FilterMenu({params}) {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [items, setItems] = useState([]);
+    const category = params;
+    // console.log(category);
     const [loading, setLoading] = useState(true);
 
 
@@ -104,6 +110,7 @@ export default function FilterMenu({ }) {
                 const { data: items, error: itemsError } = await supabase
                     .from('items')
                     .select(`
+                    id,
                     title,
                     price,
                     location,
@@ -122,7 +129,7 @@ export default function FilterMenu({ }) {
                     setLoading(false);
                     return;
                 } else {
-                    console.log(items)
+                    // console.log(items)
                     setItems(items)
                 }
             } catch (error) {
@@ -326,24 +333,7 @@ export default function FilterMenu({ }) {
                             </form>
 
                             {/* Product grid */}
-                            <div className="lg:col-span-3">{
-                                <div className="bg-white">
-
-                                    <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                                        <span >All products <span className="text-gray-600">({items ? items.length : 0} items)</span></span>
-
-                                        <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                            {items.map((item) => (
-                                                <ProductCard
-                                                    item={item}
-                                                    key={item.id}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                            }</div>
+                            <ProductList category={category}/>
                         </div>
                     </section>
                 </main>
