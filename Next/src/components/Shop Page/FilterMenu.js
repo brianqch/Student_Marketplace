@@ -15,9 +15,10 @@ import {
 } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid'
-import ProductCard from './ProductCard'; // Adjust the path as needed
+import ProductCard from '../../components/Shop Page/ProductCard'; // Adjust the path as needed
 import supabase from '../../lib/supabase'; // Adjust the path as needed
 
+import PaginationComponent from "../../components/Shop Page/PaginationComponent";
 
 // Filter
 const sortOptions = [
@@ -89,41 +90,58 @@ function classNames(...classes) {
 }
 
 
-export default function FilterMenu({ }) {
+export default function FilterMenu({}) {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1); // Track the current page
+    const pageSize = 1; // Number of items per page
+    const [totalPages, setTotalPages] = useState(1); // Total number of pages
+
+    const fetchTotalItemsCount = async () => {
+        const { count } = await supabase
+            .from('items')
+            .select('*', { count: 'exact', head: true });
+
+        const calculatedTotalPages = Math.ceil(count / pageSize);
+        setTotalPages(calculatedTotalPages);
+    };
+
+    useEffect(() => {
+        fetchTotalItemsCount(); // Fetch total count on initial load
+    }, []);
 
 
     useEffect(() => {
         const fetchItems = async () => {
-            setLoading(true);
+            // setLoading(true);
 
             try {
-                // Fetch items
+                const start = (page - 1) * pageSize;
+                const end = start + pageSize - 1;
+
                 const { data: items, error: itemsError } = await supabase
                     .from('items')
                     .select(`
-                    title,
-                    price,
-                    location,
-                    category,
-                    condition,
-                    description,
-                    created_at,
-                    items_images (
-                        image_url_arr
-                    )
-                `);
+                title,
+                price,
+                location,
+                category,
+                condition,
+                description,
+                created_at,
+                items_images (
+                    image_url_arr
+                )
+              `)
+                    .range(start, end); // Add pagination range
 
                 if (itemsError) {
                     console.error('Error fetching items:', itemsError);
                     setItems([]);
-                    setLoading(false);
-                    return;
                 } else {
-                    console.log(items)
-                    setItems(items)
+                    console.log(items);
+                    setItems(items);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -134,12 +152,14 @@ export default function FilterMenu({ }) {
         };
 
         fetchItems();
-    }, []);
+    }, [page]);
 
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setPage(newPage);
+        }
+    };
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
 
     return (
         <div className='z-15'>
@@ -161,7 +181,7 @@ export default function FilterMenu({ }) {
                                 <button
                                     type="button"
                                     onClick={() => setMobileFiltersOpen(false)}
-                                    className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
+                                    className="-mr-2 flex h-10 w-10 items-center justify-center -md bg-white p-2 text-gray-400"
                                 >
                                     <span className="sr-only">Close menu</span>
                                     <XMarkIcon aria-hidden="true" className="h-6 w-6" />
@@ -202,7 +222,7 @@ export default function FilterMenu({ }) {
                                                             id={`filter-mobile-${section.id}-${optionIdx}`}
                                                             name={`${section.id}[]`}
                                                             type="checkbox"
-                                                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                            className="h-4 w-4  border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                                         />
                                                         <label
                                                             htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
@@ -239,7 +259,7 @@ export default function FilterMenu({ }) {
 
                                 <MenuItems
                                     transition
-                                    className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                                    className="absolute right-0 z-10 mt-2 w-40 origin-top-right bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
                                 >
                                     <div className="py-1">
                                         {sortOptions.map((option) => (
@@ -312,7 +332,7 @@ export default function FilterMenu({ }) {
                                                             id={`filter-${section.id}-${optionIdx}`}
                                                             name={`${section.id}[]`}
                                                             type="checkbox"
-                                                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                            className="h-4 w-4  border-gray-300 text-uni-blue focus:ring-uni-blue"
                                                         />
                                                         <label htmlFor={`filter-${section.id}-${optionIdx}`} className="ml-3 text-sm text-gray-600">
                                                             {option.label}
@@ -325,25 +345,31 @@ export default function FilterMenu({ }) {
                                 ))}
                             </form>
 
-                            {/* Product grid */}
-                            <div className="lg:col-span-3">{
+                            <div className="lg:col-span-3">
                                 <div className="bg-white">
-
                                     <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                                        <span >All products <span className="text-gray-600">({items ? items.length : 0} items)</span></span>
+                                        <span>All products <span className="text-gray-600">({items ? items.length : 0} items)</span></span>
 
                                         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                             {items.map((item) => (
-                                                <ProductCard
-                                                    item={item}
-                                                    key={item.id}
-                                                />
+                                                <ProductCard item={item} key={item.id} />
                                             ))}
                                         </div>
+                                        {/* Pagination */}
+                                        <PaginationComponent
+                                            totalPages={totalPages}
+                                            currentPage={page}
+                                            handlePageChange={handlePageChange}
+                                        />
+
                                     </div>
                                 </div>
+                            </div>
 
-                            }</div>
+
+
+
+
                         </div>
                     </section>
                 </main>

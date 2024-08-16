@@ -1,3 +1,391 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import {
+    Dialog,
+    DialogBackdrop,
+    DialogPanel,
+    Disclosure,
+    DisclosureButton,
+    DisclosurePanel,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuItems,
+} from '@headlessui/react'
+import { XMarkIcon } from '@heroicons/react/24/outline'
+import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid'
+import ProductCard from '../../components/Shop Page/ProductCard'; // Adjust the path as needed
+import supabase from '../../lib/supabase'; // Adjust the path as needed
+
+import PaginationComponent from "../../components/Shop Page/PaginationComponent";
+
+// Filter
+const sortOptions = [
+    { name: 'Most Popular', href: '#', current: true },
+    { name: 'Best Rating', href: '#', current: false },
+    { name: 'Newest', href: '#', current: false },
+    { name: 'Price: Low to High', href: '#', current: false },
+    { name: 'Price: High to Low', href: '#', current: false },
+]
+const subCategories = [
+    { name: 'All', href: '#' },
+    { name: 'Clothes', href: '#' },
+    { name: 'Electronics', href: '#' },
+    { name: 'Appliances', href: '#' },
+    { name: 'Furniture', href: '#' },
+    { name: 'Household', href: '#' },
+    { name: 'School Supplies', href: '#' },
+    { name: 'Books', href: '#' },
+]
+const filters = [
+    {
+        id: 'price',
+        name: 'Price',
+        options: [
+            { value: '0-20', label: '$0 - $20', checked: false },
+            { value: '20-50', label: '$20 - $50', checked: false },
+            { value: '50-100', label: '$50 - $100', checked: false },
+            { value: '100+', label: '$100+', checked: false },
+        ],
+    },
+    {
+        id: 'condition',
+        name: 'Condition',
+        options: [
+            { value: 'New', label: 'New', checked: false },
+            { value: 'Used - Like New', label: 'Used - Like New', checked: false },
+            { value: 'Used - Good', label: 'Used - Good', checked: false },
+            { value: 'Used - Fair', label: 'Used - Fair', checked: false },
+        ],
+    },
+    {
+        id: 'color',
+        name: 'Color',
+        options: [
+            { value: 'white', label: 'White', checked: false },
+            { value: 'beige', label: 'Beige', checked: false },
+            { value: 'blue', label: 'Blue', checked: true },
+            { value: 'brown', label: 'Brown', checked: false },
+            { value: 'green', label: 'Green', checked: false },
+            { value: 'purple', label: 'Purple', checked: false },
+        ],
+    },
+    {
+        id: 'size',
+        name: 'Size',
+        options: [
+            { value: '2l', label: '2L', checked: false },
+            { value: '6l', label: '6L', checked: false },
+            { value: '12l', label: '12L', checked: false },
+            { value: '18l', label: '18L', checked: false },
+            { value: '20l', label: '20L', checked: false },
+            { value: '40l', label: '40L', checked: true },
+        ],
+    },
+]
+
+function classNames(...classes) {
+    return classes.filter(Boolean).join(' ')
+}
+
+
+export default function FilterMenu({}) {
+    const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1); // Track the current page
+    const pageSize = 1; // Number of items per page
+    const [totalPages, setTotalPages] = useState(1); // Total number of pages
+
+    const fetchTotalItemsCount = async () => {
+        const { count } = await supabase
+            .from('items')
+            .select('*', { count: 'exact', head: true });
+
+        const calculatedTotalPages = Math.ceil(count / pageSize);
+        setTotalPages(calculatedTotalPages);
+    };
+
+    useEffect(() => {
+        fetchTotalItemsCount(); // Fetch total count on initial load
+    }, []);
+
+
+    useEffect(() => {
+        const fetchItems = async () => {
+            // setLoading(true);
+
+            try {
+                const start = (page - 1) * pageSize;
+                const end = start + pageSize - 1;
+
+                const { data: items, error: itemsError } = await supabase
+                    .from('items')
+                    .select(`
+                title,
+                price,
+                location,
+                category,
+                condition,
+                description,
+                created_at,
+                items_images (
+                    image_url_arr
+                )
+              `)
+                    .range(start, end); // Add pagination range
+
+                if (itemsError) {
+                    console.error('Error fetching items:', itemsError);
+                    setItems([]);
+                } else {
+                    console.log(items);
+                    setItems(items);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                setItems([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchItems();
+    }, [page]);
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setPage(newPage);
+        }
+    };
+
+
+    return (
+        <div className='z-15'>
+            <div>
+                {/* Mobile filter dialog */}
+                <Dialog open={mobileFiltersOpen} onClose={setMobileFiltersOpen} className="relative z-40 lg:hidden">
+                    <DialogBackdrop
+                        transition
+                        className="fixed inset-0 bg-black bg-opacity-25 transition-opacity duration-300 ease-linear data-[closed]:opacity-0"
+                    />
+
+                    <div className="fixed inset-0 z-40 flex">
+                        <DialogPanel
+                            transition
+                            className="relative ml-auto flex h-full w-full max-w-xs transform flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl transition duration-300 ease-in-out data-[closed]:translate-x-full"
+                        >
+                            <div className="flex items-center justify-between px-4">
+                                <h2 className="text-lg font-medium text-gray-900">Filters</h2>
+                                <button
+                                    type="button"
+                                    onClick={() => setMobileFiltersOpen(false)}
+                                    className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400"
+                                >
+                                    <span className="sr-only">Close menu</span>
+                                    <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+                                </button>
+                            </div>
+
+                            {/* Filters */}
+                            <form className="mt-4 border-t border-gray-200">
+                                <h3 className="sr-only">Categories</h3>
+                                <ul role="list" className="px-2 py-3 font-medium text-gray-900">
+                                    {subCategories.map((category) => (
+                                        <li key={category.name}>
+                                            <a href={category.href} className="block px-2 py-3">
+                                                {category.name}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                {filters.map((section) => (
+                                    <Disclosure key={section.id} as="div" className="border-t border-gray-200 px-4 py-6">
+                                        <h3 className="-mx-2 -my-3 flow-root">
+                                            <DisclosureButton className="group flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
+                                                <span className="font-medium text-gray-900">{section.name}</span>
+                                                <span className="ml-6 flex items-center">
+                                                    <PlusIcon aria-hidden="true" className="h-5 w-5 group-data-[open]:hidden" />
+                                                    <MinusIcon aria-hidden="true" className="h-5 w-5 [.group:not([data-open])_&]:hidden" />
+                                                </span>
+                                            </DisclosureButton>
+                                        </h3>
+                                        <DisclosurePanel className="pt-6">
+                                            <div className="space-y-6">
+                                                {section.options.map((option, optionIdx) => (
+                                                    <div key={option.value} className="flex items-center">
+                                                        <input
+                                                            defaultValue={option.value}
+                                                            defaultChecked={option.checked}
+                                                            id={`filter-mobile-${section.id}-${optionIdx}`}
+                                                            name={`${section.id}[]`}
+                                                            type="checkbox"
+                                                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                        />
+                                                        <label
+                                                            htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
+                                                            className="ml-3 min-w-0 flex-1 text-gray-500"
+                                                        >
+                                                            {option.label}
+                                                        </label>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </DisclosurePanel>
+                                    </Disclosure>
+                                ))}
+                            </form>
+                        </DialogPanel>
+                    </div>
+                </Dialog>
+
+                <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
+                        <h1 className="text-4xl font-bold tracking-tight text-gray-900">New Arrivals</h1>
+
+                        <div className="flex items-center">
+                            <Menu as="div" className="relative inline-block text-left">
+                                <div>
+                                    <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
+                                        Sort
+                                        <ChevronDownIcon
+                                            aria-hidden="true"
+                                            className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                                        />
+                                    </MenuButton>
+                                </div>
+
+                                <MenuItems
+                                    transition
+                                    className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                                >
+                                    <div className="py-1">
+                                        {sortOptions.map((option) => (
+                                            <MenuItem key={option.name}>
+                                                <a
+                                                    href={option.href}
+                                                    className={classNames(
+                                                        option.current ? 'font-medium text-gray-900' : 'text-gray-500',
+                                                        'block px-4 py-2 text-sm data-[focus]:bg-gray-100',
+                                                    )}
+                                                >
+                                                    {option.name}
+                                                </a>
+                                            </MenuItem>
+                                        ))}
+                                    </div>
+                                </MenuItems>
+                            </Menu>
+
+                            <button type="button" className="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
+                                <span className="sr-only">View grid</span>
+                                <Squares2X2Icon aria-hidden="true" className="h-5 w-5" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setMobileFiltersOpen(true)}
+                                className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden"
+                            >
+                                <span className="sr-only">Filters</span>
+                                <FunnelIcon aria-hidden="true" className="h-5 w-5" />
+                            </button>
+                        </div>
+                    </div>
+
+                    <section aria-labelledby="products-heading" className="pb-24 pt-6">
+                        <h2 id="products-heading" className="sr-only">
+                            Products
+                        </h2>
+
+                        <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+                            {/* Filters */}
+                            <form className="hidden lg:block">
+                                <h3 className="sr-only">Categories</h3>
+                                <ul role="list" className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
+                                    {subCategories.map((category) => (
+                                        <li key={category.name}>
+                                            <a href={category.href}>{category.name}</a>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                {filters.map((section) => (
+                                    <Disclosure key={section.id} as="div" className="border-b border-gray-200 py-6">
+                                        <h3 className="-my-3 flow-root">
+                                            <DisclosureButton className="group flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
+                                                <span className="font-medium text-gray-900">{section.name}</span>
+                                                <span className="ml-6 flex items-center">
+                                                    <PlusIcon aria-hidden="true" className="h-5 w-5 group-data-[open]:hidden" />
+                                                    <MinusIcon aria-hidden="true" className="h-5 w-5 [.group:not([data-open])_&]:hidden" />
+                                                </span>
+                                            </DisclosureButton>
+                                        </h3>
+                                        <DisclosurePanel className="pt-6">
+                                            <div className="space-y-4">
+                                                {section.options.map((option, optionIdx) => (
+                                                    <div key={option.value} className="flex items-center">
+                                                        <input
+                                                            defaultValue={option.value}
+                                                            defaultChecked={option.checked}
+                                                            id={`filter-${section.id}-${optionIdx}`}
+                                                            name={`${section.id}[]`}
+                                                            type="checkbox"
+                                                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                        />
+                                                        <label htmlFor={`filter-${section.id}-${optionIdx}`} className="ml-3 text-sm text-gray-600">
+                                                            {option.label}
+                                                        </label>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </DisclosurePanel>
+                                    </Disclosure>
+                                ))}
+                            </form>
+
+                            <div className="lg:col-span-3">
+                                <div className="bg-white">
+                                    <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+                                        <span>All products <span className="text-gray-600">({items ? items.length : 0} items)</span></span>
+
+                                        <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                            {items.map((item) => (
+                                                <ProductCard item={item} key={item.id} />
+                                            ))}
+                                        </div>
+                                        {/* Pagination */}
+                                        <PaginationComponent
+                                            totalPages={totalPages}
+                                            currentPage={page}
+                                            handlePageChange={handlePageChange}
+                                        />
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+
+
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+    )
+}
+
+
+
+
+
+
+
+
+
 // "use client"
 // // src/app/dev/page.js or src/pages/dev.js
 // // import supabase from '../../lib/supabase'; // Adjust the path as needed
@@ -149,559 +537,6 @@
 // Adding getLayout to CurvedBackground
 
 // export default CurvedBackground;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"use client";
-import { useRouter } from 'next/navigation';
-import { useEffect, useState, useRef } from 'react';
-import supabase from '../../lib/supabase'; // Ensure you have Supabase client configured
-// import { v4 as uuidv4 } from 'uuid'; // To generate unique IDs for S3 keys
-import imageCompression from 'browser-image-compression'; // Import the image compression library
-
-const CreateItem = () => {
-    const [form, setForm] = useState({
-        title: "",
-        price: "",
-        location: "",
-        category: "",
-        condition: "",
-        description: "",
-        brand: ""
-    });
-    // Store images to upload
-    const fileInputRef = useRef(null);
-    const [selectedImage, setSelectedImage] = useState(null); // State for the selected image
-    const [images, setImages] = useState([]);
-
-    // Router for transferring pages
-    const router = useRouter();
-
-    // Category and condition variables
-    const [categoryVal, setCategoryVal] = useState('');
-    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-    const [showConditionDropdown, setShowConditionDropdown] = useState(false);
-    const categoryDropdownRef = useRef(null);
-    const conditionDropdownRef = useRef(null);
-    const conditions = ["New", "Used - Like New", "Used - Good", "Used - Fair"];
-    const categories = [
-        "Antiques & Collectibles",
-        "Arts & Crafts",
-        "Auto Parts & Accessories",
-        "Baby Products",
-        "Books, Movies & Music",
-        "Cell Phones & Accessories",
-        "Clothing, Shoes & Accessories",
-        "Computers & Tablets",
-        "Electronics",
-        "Furniture",
-        "Health & Beauty",
-        "Home & Garden",
-        "Jewelry & Watches",
-        "Musical Instruments",
-        "Office Supplies",
-        "Pet Supplies",
-        "Sports & Outdoors",
-        "Tools & Home Improvement",
-        "Toys & Hobbies",
-        "Video Games & Consoles"
-    ];
-
-    // Filtering for the different categories
-    const filteredCategories = categories.filter((item) =>
-        item.toLowerCase().includes(form.category.toLowerCase())
-    );
-
-     // To detect clicks and change inside for category
-    const handleCategoryInputChange = (e) => {
-        form.category = e.target.value;
-        setCategoryVal(e.target.value);
-        setShowCategoryDropdown(true);
-    };
-
-    const handleCategoryItemClick = (item) => {
-        form.category = item;
-        setCategoryVal(item);
-        setShowCategoryDropdown(false);
-    };
-
-    // To detect clicks inside for condition
-    const handleConditionToggleDropdown = () => {
-        setShowConditionDropdown((prev) => !prev);
-    };
-
-    const handleConditionItemClick = (item) => {
-        form.condition = item;
-        setShowConditionDropdown(false);
-    };
-
-    // To detect clicks outside for category and condition
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
-                categoryDropdownRef.current &&
-                !categoryDropdownRef.current.contains(event.target)
-            ) {
-                setShowCategoryDropdown(false);
-            }
-            if (
-                conditionDropdownRef.current &&
-                !conditionDropdownRef.current.contains(event.target)
-            ) {
-                setShowConditionDropdown(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    // Updating the form with new values
-    function updateForm(value) {
-        setForm(prev => ({ ...prev, ...value }));
-    }
-
-    // Process to update images, compress for better storage, and remove if necessary
-    const handleImageUpload = async (e) => {
-    const handleImageUpload = (e) => {
-        const files = Array.from(e.target.files);
-        setImages((prevImages) => [...prevImages, ...files]);
-        fileInputRef.current.value = null;
-        if (files.length > 0) {
-            setSelectedImage(URL.createObjectURL(files[0])); // Set the first uploaded image as selected
-        }
-    };
-
-    const handleThumbnailClick = (image) => {
-        setSelectedImage(URL.createObjectURL(image));
-    };
-
-
-    const compressImage = async (file) => {
-        const options = {
-            maxSizeMB: 0.7, // Maximum size in MB
-            maxWidthOrHeight: 800, // Maximum width or height
-            useWebWorker: true, // Use web workers for faster compression
-        };
-        try {
-            const compressedBlob = await imageCompression(file, options);
-            const compressedFile = new File([compressedBlob], file.name, { type: file.type });
-
-            console.log("Compressed")
-            return compressedFile;
-        } catch (error) {
-            console.error("Error compressing image:", error);
-            return file; // Return original file if compression fails
-        }
-    };
-
-    const handleImageRemove = (index) => {
-        setImages(images.filter((_, i) => i !== index));
-    };
-
-    // Functions to help get presigned url to upload images to AWS s3 bucket
-
-        setImages((prevImages) => {
-            const updatedImages = [...prevImages];
-            updatedImages.splice(index, 1);
-            console.log(updatedImages)
-            if (updatedImages.length > 0) {
-                setSelectedImage(URL.createObjectURL(updatedImages[updatedImages.length - 1])); // Select the last image
-            } else {
-                setSelectedImage(null); // No images left, clear selection
-            }
-            return updatedImages;
-        });
-    };
-
-
-    const getPresignedUrl = async (fileName, contentType, timestamp) => {
-        const response = await fetch(`/api/presigned?fileName=${encodeURIComponent(fileName)}&contentType=${encodeURIComponent(contentType)}&timestamp=${encodeURIComponent(timestamp)}`);
-        const data = await response.json();
-        return data.signedUrl;
-    };
-
-    const uploadImagesToS3 = async (images) => {
-        const imageUrls = [];
-
-        for (const file of images) {
-            if (!(file instanceof File)) {
-                throw new Error('Item in images array is not a File object');
-            }
-
-            const fileName = file.name;
-            const contentType = file.type;
-
-            try {
-                const timestamp = Date.now();
-                // Get a pre-signed URL from your server
-                const presignedUrl = await getPresignedUrl(fileName, contentType, timestamp);
-                // console.log("presignedUrl", presignedUrl)
-                // Upload the file using the pre-signed URL
-                const response = await fetch(presignedUrl, {
-                    method: 'PUT',
-                    body: file,
-                    headers: {
-                        'Content-Type': contentType,
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Failed to upload ${fileName}: ${response.statusText}`);
-                }
-
-                // Construct the URL to access the file
-                const bucketName = process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME;
-                const region = process.env.NEXT_PUBLIC_AWS_REGION;
-                const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/items-images/${timestamp}_${fileName}`;
-
-                imageUrls.push(imageUrl);
-            } catch (error) {
-                console.error('Error uploading image:', error);
-                throw error;
-            }
-        }
-
-        return imageUrls;
-    };
-
-    const onSubmit = async (e) => {
-        e.preventDefault();
-        const newItem = { ...form };
-
-        try {
-            // Insert item data into Supabase
-            const { data, error } = await supabase
-                .from('items')
-                .insert(newItem)
-                .select();
-
-            if (error) throw error;
-
-            const compressedImages = await Promise.all(
-                images.map(file => compressImage(file))
-            );
-
-            setImages(compressedImages);
-
-            console.log(data)
-            const itemId = data[0].id; // Get the newly inserted item's ID
-            // Handle image uploads
-            if (images.length > 0) {
-                console.log(images)
-                const imageUrls = await uploadImagesToS3(images);
-                console.log('Image URLs:', imageUrls);
-                const { error } = await supabase
-                    .from('items_images')
-                    .insert([{ item_id: itemId, image_url_arr: imageUrls }]);
-
-
-                if (error) {
-                    console.error('Error inserting image data:', error);
-                } else {
-                    console.log('Data inserted successfully');
-                }
-
-            }
-
-            router.push("/");
-        } catch (error) {
-            console.error('Error:', error.message);
-        }
-    };
-
-    return (
-        <div>
-            <h2 className="text-xl font-semibold p-4">Product Listing</h2>
-            <form onSubmit={onSubmit} className="p-6">
-                <div className="flex flex-col md:flex-row gap-8 justify-center">
-                    {/* Details Section */}
-                    <div className="flex flex-col w-full max-w-2xl md:w-3/4 gap-4">
-                        {/* Product Name */}
-                        <div className="flex flex-col gap-1">
-                            <span>Product Name</span>
-                            <div className="flex border-2  border-slate-400">
-                                <input
-                                    type="text"
-                                    name="title"
-                                    id="title"
-                                    placeholder="e.g. Brand New Couch"
-                                    className="block flex-1 border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus-within:ring-uni-blue text-md"
-                                    value={form.title}
-                                    onChange={(e) => updateForm({ title: e.target.value })}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex flex-row justify-between gap-2">
-                            {/* Price */}
-                            <div className="flex flex-col w-1/3 gap-1">
-                                <label htmlFor="price" className="text-md text-slate-900">Price</label>
-                                <div className="relative flex border-2   border-slate-400 ">
-                                    <input
-                                        type="number"
-                                        name="price"
-                                        placeholder="Enter price"
-                                        id="price"
-                                        min="0"
-                                        className="w-3/4 flex-1 border-0 bg-transparent pl-6 p-3 text-slate-900 text-md focus:ring-4 focus-within:ring-uni-blue"
-                                        value={form.price}
-                                        onChange={(e) => updateForm({ price: e.target.value })}
-                                    />
-                                    <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none pl-2">
-                                        <span className="text-md text-slate-900">$</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Brand */}
-                            <div className="flex flex-col w-2/3 gap-1">
-                                <span>Brand</span>
-                                <div className="relative border-2  border-slate-400">
-                                    <input
-                                        type="text"
-                                        name="brand"
-                                        id="brand"
-                                        placeholder="e.g. IKEA"
-                                        className="block flex-1 border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus-within:ring-uni-blue text-md"
-                                        value={form.brand}
-                                        onChange={(e) => updateForm({ brand: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row justify-between gap-2">
-                            {/* Category */}
-                            <div className="sm:col-span-4 w-full sm:w-1/3">
-                                <div className="relative flex flex-col gap-1">
-                                    <label
-                                        htmlFor="category"
-                                        className="block text-md leading-6 text-slate-900"
-                                    >
-                                        Category
-                                    </label>
-                                    <div className="" ref={categoryDropdownRef}>
-                                        <div className="relative flex items-center">
-                                            <input
-                                                type="text"
-                                                value={categoryVal}
-                                                onChange={handleCategoryInputChange}
-                                                placeholder="Category"
-                                                className="flex-1 shadow-sm text-md border-2   border-slate-400 focus:ring-2 focus:ring-uni-blue p-3 cursor-pointer"
-                                                onClick={() => setShowCategoryDropdown(true)}
-                                            />
-                                            <svg className="z-0 w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2 hover:cursor-pointer" fill="none" onClick={() => setShowCategoryDropdown(true)} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                            </svg>
-                                        </div>
-
-
-                                        {showCategoryDropdown && filteredCategories.length > 0 && (
-                                            <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 shadow-lg overflow-y-auto max-h-32">
-                                                {filteredCategories.map((op, index) => (
-                                                    <li
-                                                        key={index}
-                                                        className="px-4 py-2 text-md hover:bg-gray-100 cursor-pointer"
-                                                        onClick={() => handleCategoryItemClick(op)}
-                                                    >
-                                                        {op}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Condition */}
-                            <div className="sm:col-span-4 w-full sm:w-1/3">
-                                <div className="relative flex flex-col gap-1" ref={conditionDropdownRef}>
-                                    <label
-                                        htmlFor="condition"
-                                        className="block text-md leading-6 text-slate-900"
-                                    >
-                                        Condition
-                                    </label>
-                                    <div className="relative flex items-center" >
-                                        <input
-                                            type="text"
-                                            value={form.condition}
-                                            readOnly
-                                            placeholder="Condition"
-                                            className="flex-1 shadow-sm border-2   border-slate-400 focus:ring-2 focus:ring-uni-blue p-3 cursor-pointer  text-md"
-                                            onClick={handleConditionToggleDropdown}
-                                        />
-                                        <svg className="z-0 w-5 h-5 ml-2 absolute right-3 top-1/2 transform -translate-y-1/2 hover:cursor-pointer" fill="none" onClick={handleConditionToggleDropdown} stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                        {showConditionDropdown && (
-                                            <ul className="absolute top-full left-0 w-full mt-1 bg-white border border-gray-300 shadow-lg z-10">
-                                                {conditions.map((condition, index) => (
-                                                    <li
-                                                        key={index}
-                                                        onClick={() => handleConditionItemClick(condition)}
-                                                        className="p-2 cursor-pointer text-md hover:bg-gray-200"
-                                                    >
-                                                        {condition}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Region */}
-                            <div className="flex flex-col gap-1 w-full sm:w-1/3">
-                                <span>Region</span>
-                                <div className="flex border-2 border-slate-400 ">
-                                    <input
-                                        type="text"
-                                        name="location"
-                                        id="location"
-                                        className="block flex-1 border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus:ring-uni-blue text-md"
-                                        placeholder="Northside, southside, etc."
-                                        value={form.location}
-                                        onChange={(e) => updateForm({ location: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {/* Description */}
-                        <div className="flex flex-col gap-1">
-                            <span>Description</span>
-                            <div className="flex border-2  border-slate-400 ">
-                                <textarea
-                                    name="description"
-                                    id="description"
-                                    className="block w-full border-0 bg-transparent pl-2 p-3 text-slate-900 focus:ring-4 focus:ring-uni-blue text-md h-44 resize-none"
-                                    placeholder="Describe the item, condition, and any special features..."
-                                    value={form.description}
-                                    onChange={(e) => updateForm({ description: e.target.value })}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Submit Button */}
-                        <div className="flex mt-auto">
-                            <button
-                                type="submit"
-                                className="px-4 py-2 bg-uni-blue text-white border-2 border-black hover:bg-blue-500 transition-colors duration-100hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            >
-                                Submit
-                            </button>
-                        </div>
-
-                    </div>
-
-                    <div>
-                        {/* Images */}
-                        <div className="sm:col-span-4 gap-1">
-                            <label
-                                htmlFor="images"
-                                className="block text-md leading-"
-                            >
-                                Upload Images
-                            </label>
-                            <div className="flex flex-col sm:flex-row justify-start gap-2">
-                                <div className="relative aspect-square w-[25vw] max-w-[700px] max-h-[700px] bg-gray-100 border border-gray-300 flex items-center justify-center">
-                                    <input
-                                        type="file"
-                                        id="images"
-                                        name="images"
-                                        accept="image/*"
-                                        multiple
-                                        onChange={handleImageUpload}
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                        ref={fileInputRef}
-                                    />
-                                    {selectedImage ? (
-                                        <img
-                                            src={selectedImage}
-                                            alt="preview"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <div className="text-center">
-                                            <div className="text-5xl text-gray-400">
-                                                <span className="plus-sign">+</span>
-                                            </div>
-                                            <p className="text-gray-500 mt-2">Upload Image</p>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="flex flex-row sm:flex-col">
-                                    {(images.length > 0) ? (
-                                        <div className="flex flex-row sm:flex-col ml-4 gap-2">
-                                            {images.map((image, index) => (
-                                                <div key={index} className="relative w-20 h-20">
-                                                    <img
-                                                        src={URL.createObjectURL(image)}
-                                                        alt={`preview-${index}`}
-                                                        className="w-full h-full aspect-square object-cover hover:cursor-pointer"
-                                                        onClick={() => handleThumbnailClick(image)} // Update preview on click
-
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleImageRemove(index)}
-                                                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center"
-                                                    >
-                                                        &times;
-                                                    </button>
-                                                </div>
-                                            ))}
-                                            <button
-                                                type="button"
-                                                onClick={() => document.getElementById('images').click()}
-                                                className="relative w-20 h-20 bg-gray-100 border border-gray-300 flex items-center justify-center text-2xl text-gray-500"
-                                            >
-                                                +
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <button
-                                            type="button"
-                                            onClick={() => document.getElementById('images').click()}
-                                            className="relative w-20 h-20 bg-gray-100 border border-gray-300 flex items-center justify-center text-2xl text-gray-500"
-                                        >
-                                            +
-                                        </button>
-                                    )}
-                                </div>
-
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-            </form>
-        </div>
-    );
-
-
-};
-
-export default CreateItem;
 
 
 
