@@ -4,7 +4,7 @@ export default function ProductCard(props) {
     <div className="relative aspect-h-1 aspect-w-1 w-full lg:aspect-none  bg-white bg-clip-border border border-black text-gray-700 transition-shadow duration-300 hover:shadow-right-bottom hover:shadow-gray-400 cursor-pointer">
       
       {/* SVG Icon */}
-      <div className="absolute top-[-1.5rem] left-[-1.5rem] z-20">
+      <div className="absolute top-[-1.5rem] left-[-1.5rem] z-20 ">
         <img src="/vouched.svg" alt="Icon" className="h-16 w-16" />
       </div>
 

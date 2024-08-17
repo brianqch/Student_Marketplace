@@ -1,7 +1,10 @@
 import Image from "next/image";
 import ImageCarousel from "./ImageCarousel";
 
+
+
 const SchoolLanding = ({ school }) => {
+
     // Aspect ratio calculation (height / width * 100)
     const aspectRatio = (1996 / 2951) * 100; // Adjust with your image dimensions
 

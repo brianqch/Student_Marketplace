@@ -12,7 +12,25 @@ import supabase from '../../lib/supabase'; // Adjust the path as needed
 
 
 async function fetchData() {
-    const { data: items, error } = await supabase.from('items').select('*');
+    const { data: items, error } = await supabase
+        .from('items')
+        .select(`
+            id,
+            title,
+            price,
+            location,
+            category,
+            condition,
+            description,
+            created_at,
+            items_images (
+                image_url_arr
+            )
+        `)
+        .order('created_at', { ascending: false }) // Order by created_at in descending order
+        .limit(5); // Limit the number of results to 5
+
+
     if (error) {
         console.error('Error fetching items:', error);
         return [];
@@ -21,11 +39,30 @@ async function fetchData() {
     }
 };
 
+
+function getTimeAgo(createdAt) {
+    const now = new Date();
+    const timestamp = new Date(createdAt);
+    const seconds = Math.floor((now - timestamp) / 1000);
+
+    if (seconds < 60) {
+        return `${seconds} second(s) ago`;
+    } else if (seconds < 3600) {
+        const minutes = Math.floor(seconds / 60);
+        return `${minutes} minute(s) ago`;
+    } else if (seconds < 86400) {
+        const hours = Math.floor(seconds / 3600);
+        return `${hours} hour(s) ago`;
+    } else {
+        const days = Math.floor(seconds / 86400);
+        return `${days} day(s) ago`;
+    }
+}
+
 export default async function ImageCarousel() {
     const data = await fetchData();
 
     return (
-
         <Carousel
             opts={{
                 align: "center",
@@ -34,53 +71,31 @@ export default async function ImageCarousel() {
             className="w-full max-w-2xl max-h-xl"
         >
             <CarouselContent>
-                {data.map((item, index) => (
-                    <CarouselItem key={index} className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-                        <div className="p-1">
-                            <Card className="w-full h-full">
-                                <CardContent className="flex items-center justify-center p-10">
-                                    <span className="text-4xl font-semibold">{item.id}</span>
-                                </CardContent>
-                            </Card>
-                            <p className="pt-1 text-[14px] text-[#959595]">Just now</p>
-                        </div>
-
-                    </CarouselItem>
-
-                ))}
+                {data.length > 0 ? (
+                    data.map((item, index) => (
+                        <CarouselItem key={index} className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                            <div className="p-1">
+                                <Card className="w-full h-full flex flex-col"> {/* Added 'flex' and 'flex-col' */}
+                                    <CardContent className="flex-1 p-0"> {/* Make the content area flexible */}
+                                        <img
+                                            src={
+                                                item.items_images[0].image_url_arr[0]
+                                            }
+                                            className="h-full w-full object-cover aspect-square overflow-hidden" // Ensure the image covers the card
+                                            alt='/images/missing.png'
+                                        />
+                                    </CardContent>
+                                </Card>
+                                <p className="pt-1 text-[14px] text-[#959595]">{getTimeAgo(item.created_at)}</p>
+                            </div>
+                        </CarouselItem>
+                    ))
+                ) : (
+                    <p>No items available</p>
+                )}
             </CarouselContent>
             <CarouselPrevious />
             <CarouselNext />
         </Carousel>
-    )
+    );
 }
-
-// return (
-//     <Carousel
-//         opts={{
-//             align: "center",
-//             loop: true,
-//         }}
-//         className="w-full max-w-2xl max-h-xl"
-//     >
-//         <CarouselContent>
-//             {data.map((item, index) => (
-//                 <CarouselItem key={index} className="md:basis-1/3 lg:basis-1/5">
-//                     <div className="p-1">
-//                         <Card className="w-full h-full">
-//                             <CardContent className="flex items-center justify-center p-10">
-//                                 <img
-//                                     src={item.imageUrl} // Display the image
-//                                     alt={`Image ${index + 1}`} // Alt text for accessibility
-//                                     className="w-full h-full object-cover" // Adjust classes as needed
-//                                 />
-//                             </CardContent>
-//                         </Card>
-//                     </div>
-//                 </CarouselItem>
-//             ))}
-//         </CarouselContent>
-//         <CarouselPrevious />
-//         <CarouselNext />
-//     </Carousel>
-// );
