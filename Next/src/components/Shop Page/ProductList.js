@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import supabase from '../../lib/supabase';
-import PaginationComponent from "../Shop Page/PaginationComponent";
 
-export default function ProductList({ category, categoryTitle, page, pageSize }) {
+export default function ProductList({ category, categoryTitle, page, pageSize, filters }) {
     const [items, setItems] = useState([]);
+
+
+
 
     useEffect(() => {
         const fetchItems = async () => {
@@ -28,11 +30,54 @@ export default function ProductList({ category, categoryTitle, page, pageSize })
                         items_images (
                             image_url_arr
                         )
-                    `).range(start, end);
+                    `)
 
+                // Filter by category
                 if (category) {
                     query.ilike('category', `%${category.category}%`);
                 }
+
+                // Filter by price 
+                const selectedPrices = filters
+                    .find((filter) => filter.id === 'price')
+                    ?.options.filter((option) => option.checked);
+
+                const priceFilter = [];
+                selectedPrices.forEach((price) => {
+                    const [min, max] = price.value.split('-');
+                
+                    if (max) {
+                        // Add condition for range
+                        priceFilter.push(`and(price.gte.${min},price.lte.${max})`);
+                    } else {
+                        // Add condition for single value
+                        priceFilter.push(`price.gte.${min}`);
+                    }
+                });
+
+                if (priceFilter.length > 0) {
+                    query.or(priceFilter.join(','))
+                }
+
+                // Filter by condition
+                const selectedCondition = filters
+                    .find((filter) => filter.id === 'condition')
+                    ?.options.filter((option) => option.checked);
+                
+                console.log(selectedCondition)
+                const conditionFilter = []
+                selectedCondition.forEach((condition) => {
+                    conditionFilter.push(`condition.eq.${condition.value}`)
+                });
+                
+                if (conditionFilter.length > 0) {
+                    query.or(conditionFilter.join(','))
+                }
+
+
+                
+                // Pagination
+                query.range(start, end);
 
 
                 const { data: items, error: itemsError } = await query;
@@ -51,15 +96,11 @@ export default function ProductList({ category, categoryTitle, page, pageSize })
         };
 
         fetchItems();
-    }, [category, page]);
+    }, [category, page, filters]);
 
 
     return (
-        // <div className="lg:col-span-3">{
-        //     <div className="bg-white">
 
-        //         <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-        //             <span >All products <span className="text-gray-600">({items ? items.length : 0} items)</span></span>
         <div>
             <span>
                 {categoryTitle}
@@ -74,10 +115,7 @@ export default function ProductList({ category, categoryTitle, page, pageSize })
                 ))}
             </div>
 
-
-
         </div>
 
-        // }</div>
     )
 }

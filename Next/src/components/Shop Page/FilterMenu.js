@@ -40,52 +40,7 @@ const subCategories = [
     { name: 'Books', href: '/shop/books' },
 ];
 
-const filters = [
-    {
-        id: 'price',
-        name: 'Price',
-        options: [
-            { value: '0-20', label: '$0 - $20', checked: false },
-            { value: '20-50', label: '$20 - $50', checked: false },
-            { value: '50-100', label: '$50 - $100', checked: false },
-            { value: '100+', label: '$100+', checked: false },
-        ],
-    },
-    {
-        id: 'condition',
-        name: 'Condition',
-        options: [
-            { value: 'New', label: 'New', checked: false },
-            { value: 'Used - Like New', label: 'Used - Like New', checked: false },
-            { value: 'Used - Good', label: 'Used - Good', checked: false },
-            { value: 'Used - Fair', label: 'Used - Fair', checked: false },
-        ],
-    },
-    {
-        id: 'color',
-        name: 'Color',
-        options: [
-            { value: 'white', label: 'White', checked: false },
-            { value: 'beige', label: 'Beige', checked: false },
-            { value: 'blue', label: 'Blue', checked: true },
-            { value: 'brown', label: 'Brown', checked: false },
-            { value: 'green', label: 'Green', checked: false },
-            { value: 'purple', label: 'Purple', checked: false },
-        ],
-    },
-    {
-        id: 'size',
-        name: 'Size',
-        options: [
-            { value: '2l', label: '2L', checked: false },
-            { value: '6l', label: '6L', checked: false },
-            { value: '12l', label: '12L', checked: false },
-            { value: '18l', label: '18L', checked: false },
-            { value: '20l', label: '20L', checked: false },
-            { value: '40l', label: '40L', checked: true },
-        ],
-    },
-]
+
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -93,14 +48,60 @@ function classNames(...classes) {
 
 
 export default function FilterMenu({ params }) {
+    const [filters, setFilters] = useState([
+        {
+            id: 'price',
+            name: 'Price',
+            options: [
+                { value: '0-20', label: '$0 - $20', checked: false },
+                { value: '20-50', label: '$20 - $50', checked: false },
+                { value: '50-100', label: '$50 - $100', checked: false },
+                { value: '100', label: '$100+', checked: false },
+            ],
+        },
+        {
+            id: 'condition',
+            name: 'Condition',
+            options: [
+                { value: 'New', label: 'New', checked: false },
+                { value: 'Used - Like New', label: 'Used - Like New', checked: false },
+                { value: 'Used - Good', label: 'Used - Good', checked: false },
+                { value: 'Used - Fair', label: 'Used - Fair', checked: false },
+            ],
+        },
+        {
+            id: 'color',
+            name: 'Color',
+            options: [
+                { value: 'white', label: 'White', checked: false },
+                { value: 'beige', label: 'Beige', checked: false },
+                { value: 'blue', label: 'Blue', checked: false },
+                { value: 'brown', label: 'Brown', checked: false },
+                { value: 'green', label: 'Green', checked: false },
+                { value: 'purple', label: 'Purple', checked: false },
+            ],
+        },
+        {
+            id: 'size',
+            name: 'Size',
+            options: [
+                { value: '2l', label: '2L', checked: false },
+                { value: '6l', label: '6L', checked: false },
+                { value: '12l', label: '12L', checked: false },
+                { value: '18l', label: '18L', checked: false },
+                { value: '20l', label: '20L', checked: false },
+                { value: '40l', label: '40L', checked: false },
+            ],
+        },
+    ]);
+
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [items, setItems] = useState([]);
     const category = params;
     const categoryTitle = category ? (params.category).charAt(0).toUpperCase() + (params.category).slice(1) : "All Products";
-    console.log(categoryTitle)
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1); // Track the current page
-    const pageSize = 2; // Number of items per page
+    const pageSize = 4; // Number of items per page
     const [totalPages, setTotalPages] = useState(1); // Total number of pages
 
     const fetchTotalItemsCount = async () => {
@@ -119,51 +120,33 @@ export default function FilterMenu({ params }) {
 
 
     useEffect(() => {
-        const fetchItems = async () => {
-            setLoading(true);
-
-            try {
-                // Fetch items
-                const { data: items, error: itemsError } = await supabase
-                    .from('items')
-                    .select(`
-                    id,
-                    title,
-                    price,
-                    location,
-                    category,
-                    condition,
-                    description,
-                    created_at,
-                    items_images (
-                        image_url_arr
-                    )
-                `);
-
-                if (itemsError) {
-                    console.error('Error fetching items:', itemsError);
-                    setItems([]);
-                    setLoading(false);
-                    return;
-                } else {
-                    // console.log(items)
-                    setItems(items)
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                setItems([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchItems();
+            setLoading(false);
     }, []);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setPage(newPage);
         }
+    };
+
+    const handleCheckboxChange = (sectionId, optionValue) => {
+        // Update the filters state when a checkbox is clicked
+        setFilters((prevFilters) =>
+            prevFilters.map((section) => {
+                if (section.id === sectionId) {
+                    return {
+                        ...section,
+                        options: section.options.map((option) => {
+                            if (option.value === optionValue) {
+                                return { ...option, checked: !option.checked }; // Toggle the checked state
+                            }
+                            return option;
+                        }),
+                    };
+                }
+                return section;
+            })
+        );
     };
 
 
@@ -227,12 +210,14 @@ export default function FilterMenu({ params }) {
                                                 {section.options.map((option, optionIdx) => (
                                                     <div key={option.value} className="flex items-center">
                                                         <input
-                                                            defaultValue={option.value}
-                                                            defaultChecked={option.checked}
+                                                            value={option.value}
+                                                            checked={option.checked}
                                                             id={`filter-mobile-${section.id}-${optionIdx}`}
                                                             name={`${section.id}[]`}
                                                             type="checkbox"
                                                             className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                            onChange={() => handleCheckboxChange(section.id, option.value)}
+
                                                         />
                                                         <label
                                                             htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
@@ -250,6 +235,8 @@ export default function FilterMenu({ params }) {
                         </DialogPanel>
                     </div>
                 </Dialog>
+
+
 
                 <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
@@ -337,12 +324,14 @@ export default function FilterMenu({ params }) {
                                                 {section.options.map((option, optionIdx) => (
                                                     <div key={option.value} className="flex items-center">
                                                         <input
-                                                            defaultValue={option.value}
-                                                            defaultChecked={option.checked}
+                                                            value={option.value}
+                                                            checked={option.checked}
                                                             id={`filter-${section.id}-${optionIdx}`}
                                                             name={`${section.id}[]`}
                                                             type="checkbox"
                                                             className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                            onChange={() => handleCheckboxChange(section.id, option.value)}
+
                                                         />
                                                         <label htmlFor={`filter-${section.id}-${optionIdx}`} className="ml-3 text-sm text-gray-600">
                                                             {option.label}
@@ -362,7 +351,7 @@ export default function FilterMenu({ params }) {
 
                                     <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
                                 
-                                        <ProductList category={category} categoryTitle={categoryTitle} page={page} pageSize={pageSize} />
+                                        <ProductList category={category} categoryTitle={categoryTitle} page={page} pageSize={pageSize} filters={filters}/>
 
                                         {/* Pagination */}
                                         <PaginationComponent
