@@ -49,6 +49,14 @@ export default function NewNavbar() {
     }
   };
 
+  const handleRedirectToCreateListing = () => {
+    if (user) {
+      router.push('/items/create'); // Redirect to dashboard if user is logged in
+    } else {
+      router.push('/'); // Redirect to home page if user is not logged in
+    }
+  };
+
   return (
     <nav className="relative px-14 z-40">
 
@@ -83,7 +91,7 @@ export default function NewNavbar() {
                 {/* Divider */}
                 <div className="h-7 border-l-2 border-gray-300 mx-2"></div> 
                 {/* Divider */}
-                <button className="border-2 border-slate-950 bg-[#432d2d] p-2 text-white text-sm sm:text-base min-w-[100px]">SELL NOW</button>
+                <button className="border-2 border-slate-950 bg-[#432d2d] p-2 text-white text-sm sm:text-base min-w-[100px]" onClick={handleRedirectToCreateListing}>SELL NOW</button>
 
 
 
@@ -109,7 +117,7 @@ export default function NewNavbar() {
                 <div className="h-7 border-l-2 border-gray-300 mx-2"></div> 
                 {/* Divider */}
                 <Link href="/" className="hover:text-indigo-600 text-gray-700">Log In</Link>
-                <button className="border-2 border-slate-950 bg-[#432d2d] p-2 text-white">SIGN UP</button>
+                <button className="border-2 border-slate-950 bg-[#432d2d] p-2 text-white" >SIGN UP</button>
                 </div>
                 <div className="flex space-x-4 items-center md:hidden">
                   <Link
