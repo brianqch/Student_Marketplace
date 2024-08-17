@@ -96,7 +96,8 @@ export default function FilterMenu({ params }) {
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [items, setItems] = useState([]);
     const category = params;
-    // console.log(category);
+    const categoryTitle = category ? (params.category).charAt(0).toUpperCase() + (params.category).slice(1) : "All Products";
+    console.log(categoryTitle)
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1); // Track the current page
     const pageSize = 2; // Number of items per page
@@ -360,9 +361,8 @@ export default function FilterMenu({ params }) {
                                 <div className="bg-white">
 
                                     <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                                        <span >All products <span className="text-gray-600">({items ? items.length : 0} items)</span></span>
-
-                                        <ProductList category={category} page={page} pageSize={pageSize} />
+                                
+                                        <ProductList category={category} categoryTitle={categoryTitle} page={page} pageSize={pageSize} />
 
                                         {/* Pagination */}
                                         <PaginationComponent

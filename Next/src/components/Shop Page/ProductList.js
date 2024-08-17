@@ -4,7 +4,7 @@ import ProductCard from './ProductCard';
 import supabase from '../../lib/supabase';
 import PaginationComponent from "../Shop Page/PaginationComponent";
 
-export default function ProductList({ category, page, pageSize}) {
+export default function ProductList({ category, categoryTitle, page, pageSize }) {
     const [items, setItems] = useState([]);
 
     useEffect(() => {
@@ -60,25 +60,23 @@ export default function ProductList({ category, page, pageSize}) {
 
         //         <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         //             <span >All products <span className="text-gray-600">({items ? items.length : 0} items)</span></span>
-
-                    <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {items.map((item) => (
-                            <ProductCard
-                                key={item.id}
-                                item={item}
-                            />
-                        ))}
-                    </div>
-        //             {/* Pagination */}
-        //             <PaginationComponent
-        //                 totalPages={totalPages}
-        //                 currentPage={currentPage}
-        //                 handlePageChange={handlePageChange}
-        //             />
-        //         </div>
+        <div>
+            <span>
+                {categoryTitle}
+                <span className="text-gray-600"> ({items ? items.length : 0} items)</span>
+            </span>
+            <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {items.map((item) => (
+                    <ProductCard
+                        key={item.id}
+                        item={item}
+                    />
+                ))}
+            </div>
 
 
-        //     </div>
+
+        </div>
 
         // }</div>
     )
