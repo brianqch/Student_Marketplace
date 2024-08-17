@@ -1,8 +1,8 @@
-import FilterMenu from "../../components/Shop Page/FilterMenu"
-import SchoolLanding from "../../components/Shop Page/ShopLanding"
-import BerkeleyBackground from "../../../public/images/berkbackground.png"
+import FilterMenu from "../../../components/Shop Page/FilterMenu"
+import SchoolLanding from "../../../components/Shop Page/ShopLanding"
+import BerkeleyBackground from "../../../../public/images/berkbackground.png"
 
-export default function Shop() {
+export default function Shop({params}) {
 
     const schoolData = {
         "UCB": {
@@ -18,7 +18,7 @@ export default function Shop() {
     return (
         <div >
             <SchoolLanding school = {schoolData["UCB"]}></SchoolLanding>
-            <FilterMenu></FilterMenu>
+            <FilterMenu params={params}></FilterMenu>
         </div>
     )
 }
