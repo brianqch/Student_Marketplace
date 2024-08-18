@@ -1,0 +1,37 @@
+/* styles/ProductDetail.module.css */
+
+.swiperWrapper {
+    height: max-content !important;
+    width: max-content;
+  }
+  
+  .swiperButtonPrevAfter,
+  .swiperRtl .swiperButtonNextAfter {
+    content: "" !important;
+  }
+  
+  .swiperButtonNextAfter,
+  .swiperRtl .swiperButtonPrevAfter {
+    content: "" !important;
+  }
+  
+  .productThumb .swiperSlide.swiperSlideThumbActive > .slideBorderIndigo600 {
+    --tw-border-opacity: 1;
+    border-color: rgb(79 70 229 / var(--tw-border-opacity));
+  }
+  
+  .colorButton {
+    padding: 0.625rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 9999px;
+    transition: all 0.3s;
+  }
+  
+  .colorButton:hover {
+    border-color: #10b981;
+  }
+  
+  .checked {
+    border-color: #10b981;
+  }
+  
