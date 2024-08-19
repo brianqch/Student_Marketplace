@@ -47,6 +47,7 @@ function classNames(...classes) {
 }
 
 
+
 export default function FilterMenu({ params }) {
     const [filters, setFilters] = useState([
         {
@@ -95,10 +96,15 @@ export default function FilterMenu({ params }) {
         },
     ]);
 
+    if (params) {
+        console.log((params.category).charAt(0).toUpperCase() + (params.category).slice(1));
+    }
+
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [items, setItems] = useState([]);
-    const category = params;
-    const categoryTitle = category ? (params.category).charAt(0).toUpperCase() + (params.category).slice(1) : "All Products";
+    const category = params ? params.category : '';
+    const upperCaseCategory = (category).charAt(0).toUpperCase() + (category).slice(1);
+    const categoryTitle = category ? upperCaseCategory : "All Products";
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1); // Track the current page
     const pageSize = 4; // Number of items per page
@@ -187,7 +193,7 @@ export default function FilterMenu({ params }) {
                                 <ul role="list" className="px-2 py-3 font-medium text-gray-900">
                                     {subCategories.map((category) => (
                                         <li key={category.name}>
-                                            <a href={category.href} className="block px-2 py-3">
+                                            <a href={category.href} className={`block px-2 py-3`}>
                                                 {category.name}
                                             </a>
                                         </li>
@@ -303,7 +309,7 @@ export default function FilterMenu({ params }) {
                                 <ul role="list" className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
                                     {subCategories.map((category) => (
                                         <li key={category.name}>
-                                            <a href={category.href}>{category.name}</a>
+                                            <a href={category.href} className={`${upperCaseCategory == category.name ? 'text-indigo-500 font-bold' : 'hover:text-indigo-300'}`}>{category.name}</a>
                                         </li>
                                     ))}
                                 </ul>

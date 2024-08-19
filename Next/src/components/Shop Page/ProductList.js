@@ -34,7 +34,7 @@ export default function ProductList({ category, categoryTitle, page, pageSize, f
 
                 // Filter by category
                 if (category) {
-                    query.ilike('category', `%${category.category}%`);
+                    query.ilike('category', `%${category}%`);
                 }
 
                 // Filter by price 
