@@ -96,9 +96,9 @@ export default function FilterMenu({ params }) {
         },
     ]);
 
-    if (params) {
-        console.log((params.category).charAt(0).toUpperCase() + (params.category).slice(1));
-    }
+    // if (params) {
+    //     console.log((params.category).charAt(0).toUpperCase() + (params.category).slice(1));
+    // }
 
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [items, setItems] = useState([]);

@@ -64,7 +64,6 @@ export default function ProductList({ category, categoryTitle, page, pageSize, f
                     .find((filter) => filter.id === 'condition')
                     ?.options.filter((option) => option.checked);
                 
-                console.log(selectedCondition)
                 const conditionFilter = []
                 selectedCondition.forEach((condition) => {
                     conditionFilter.push(`condition.eq.${condition.value}`)
