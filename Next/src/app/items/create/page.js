@@ -22,7 +22,6 @@ const CreateItem = ({ params }) => {
     const [showConditionDropdown, setShowConditionDropdown] = useState(false);
 
     const router = useRouter();
-    const { id } = params;
     const conditions = ["New", "Used - Like New", "Used - Good", "Used - Fair"];
     const categories = [
         "Antiques & Collectibles",
@@ -118,6 +117,20 @@ const CreateItem = ({ params }) => {
     };
 
 
+    const handleImageRemove = (index) => {
+
+        setImages((prevImages) => {
+            const updatedImages = [...prevImages];
+            updatedImages.splice(index, 1);
+            if (updatedImages.length > 0) {
+                setSelectedImage(URL.createObjectURL(updatedImages[updatedImages.length - 1])); // Select the last image
+            } else {
+                setSelectedImage(null); // No images left, clear selection
+            }
+            return updatedImages;
+        });
+    };
+
     const compressImage = async (file) => {
         const options = {
             maxSizeMB: 0.7, // Maximum size in MB
@@ -134,21 +147,6 @@ const CreateItem = ({ params }) => {
             console.error("Error compressing image:", error);
             return file; // Return original file if compression fails
         }
-    };
-
-    const handleImageRemove = (index) => {
-
-        setImages((prevImages) => {
-            const updatedImages = [...prevImages];
-            updatedImages.splice(index, 1);
-            console.log(updatedImages)
-            if (updatedImages.length > 0) {
-                setSelectedImage(URL.createObjectURL(updatedImages[updatedImages.length - 1])); // Select the last image
-            } else {
-                setSelectedImage(null); // No images left, clear selection
-            }
-            return updatedImages;
-        });
     };
 
 
@@ -224,9 +222,8 @@ const CreateItem = ({ params }) => {
             console.log(data)
             const itemId = data[0].id; // Get the newly inserted item's ID
             // Handle image uploads
-            if (images.length > 0) {
-                console.log(images)
-                const imageUrls = await uploadImagesToS3(images);
+            if (compressedImages.length > 0) {
+                const imageUrls = await uploadImagesToS3(compressedImages);
                 console.log('Image URLs:', imageUrls);
                 const { error } = await supabase
                     .from('items_images')
@@ -250,7 +247,7 @@ const CreateItem = ({ params }) => {
     return (
         <div>
             <h2 className="text-xl font-semibold p-4">Product Listing</h2>
-            <form onSubmit={onSubmit} className="p-6">
+            <form onSubmit={onSubmit}>
                 <div className="flex flex-col lg:flex-row gap-8 justify-center">
                     {/* Details Section */}
                     <div className="flex flex-col w-full max-w-2xl gap-4">

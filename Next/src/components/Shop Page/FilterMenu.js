@@ -126,7 +126,7 @@ export default function FilterMenu({ params }) {
 
 
     useEffect(() => {
-            setLoading(false);
+        setLoading(false);
     }, []);
 
     const handlePageChange = (newPage) => {
@@ -352,25 +352,23 @@ export default function FilterMenu({ params }) {
 
 
                             {/* Product grid */}
-                            <div className="lg:col-span-3">{
-                                <div className="bg-white">
-
+                            <div className="lg:col-span-3 relative">  {/* Add relative positioning here */}
+                                <div className="bg-white h-full">  {/* Ensure this container takes full height */}
                                     <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                                
-                                        <ProductList category={category} categoryTitle={categoryTitle} page={page} pageSize={pageSize} filters={filters}/>
+                                        <ProductList category={category} categoryTitle={categoryTitle} page={page} pageSize={pageSize} filters={filters} />
 
                                         {/* Pagination */}
-                                        <PaginationComponent
-                                            totalPages={totalPages}
-                                            currentPage={page}
-                                            handlePageChange={handlePageChange}
-                                        />
+                                        <div className="absolute bottom-0 right-0 mb-4 mr-4">  {/* Positioning the pagination */}
+                                            <PaginationComponent
+                                                totalPages={totalPages}
+                                                currentPage={page}
+                                                handlePageChange={handlePageChange}
+                                            />
+                                        </div>
                                     </div>
-
-
                                 </div>
+                            </div>
 
-                            }</div>
 
                         </div>
                     </section>

@@ -32,6 +32,10 @@ function PaginationComponent({ totalPages, currentPage, handlePageChange }) {
 
   const pages = generatePageNumbers();
 
+  if (pages == 0) {
+    return;
+  }
+
   return (
     <div className="flex justify-end mt-8">
       <div className="flex items-center">

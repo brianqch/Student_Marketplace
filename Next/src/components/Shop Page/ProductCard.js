@@ -14,7 +14,7 @@ export default function ProductCard(props) {
           src={
             props.item.items_images.length > 0
               ? props.item.items_images[0].image_url_arr[0]
-              : '/images/missing.png'
+              : '/images/missing.jpg'
           }
           className="h-full w-full object-cover"
           alt="Image"
