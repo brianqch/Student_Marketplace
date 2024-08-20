@@ -130,7 +130,7 @@ const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, se
             
             <button onClick={handleGoogleSignUp} className="flex py-4 px-4 rounded border-gray-200 border items-center justify-center gap-3 w-full hover:shadow-md transition-colors duration-100 text-[#3c4043]">
             <FcGoogle />
-            Sign up with Google
+            Sign up with Google (.edu)
             </button>
             <span className="flex items-center justify-center bg-white py-3 text-gray-400">or</span>
             
@@ -153,7 +153,7 @@ const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, se
                     type="email"
                     value={email}
                     onChange={handleEmailChange}
-                    placeholder="Email *"
+                    placeholder="Edu Email *"
                     className={`p-0 py-2 border-0 border-b-2 border-black focus:ring-0 focus:bg-yamber focus:border-black transition-colors duration-200 font-palanquin ${emailError && `bg-red-200`}` }                />
                 <input
                     type="password"

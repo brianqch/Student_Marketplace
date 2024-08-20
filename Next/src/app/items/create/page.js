@@ -202,9 +202,15 @@ const CreateItem = ({ params }) => {
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        const newItem = { ...form };
+    
 
         try {
+            const user = await supabase.auth.getUser();
+
+            const newItem = { 
+                ...form,
+                user_id: user.data.user.id
+            };
             // Insert item data into Supabase
             const { data, error } = await supabase
                 .from('items')
