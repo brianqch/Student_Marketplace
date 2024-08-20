@@ -125,14 +125,16 @@ const EditItem = ({ params }) => {
                     condition,
                     description,
                 });
-
-                setOriginalImages(items_images[0].image_url_arr);
-                const imageUrls = items_images[0].image_url_arr;
-                setImages(imageUrls)
-
-                if (imageUrls.length > 0) {
-                    setSelectedImage(imageUrls[(imageUrls.length - 1)])
+                if (items_images.length > 0) {
+                    setOriginalImages(items_images[0].image_url_arr);
+                    const imageUrls = items_images[0].image_url_arr;
+                    setImages(imageUrls)
+                    if (imageUrls.length > 0) {
+                        setSelectedImage(imageUrls[(imageUrls.length - 1)])
+                    }
                 }
+
+                
 
                 setCategoryVal(item.category);
 
@@ -510,13 +512,15 @@ const EditItem = ({ params }) => {
                                 onChange={(e) => updateForm({ description: e.target.value })}
                             />
                         </div>
+                        <div className="flex justify-start">
 
                         <button
                             type="submit"
-                            className="bg-blue-500 text-white p-2 rounded mt-4"
-                        >
+                            className="w-auto px-4 py-2 bg-blue-500 text-white"
+                            >
                             Update Item
                         </button>
+                        </div>
                     </form>
                 </div>
 

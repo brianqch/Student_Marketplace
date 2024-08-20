@@ -62,7 +62,7 @@ const SchoolLanding = ({ school }) => {
                 />
 
                 {/* Text Inside Curved Rectangle */}
-                <div className="absolute flex flex-row justify-evenly top-1/2 left-1/2 w-full transform -translate-x-1/2 -translate-y-1/4 pl-[10%] hidden md:flex z-20">
+                <div className="absolute flex flex-row justify-evenly top-1/2 left-1/2 w-full transform -translate-x-1/2 -translate-y-1/4 pl-[10%] md:flex z-20">
                     <div className="flex flex-row pr-4">
                         <img src="/stars.svg" alt="Stars" className="h-8 w-8" />
                         <span className="font-palanquin font-medium text-2xl text-black pl-2">
