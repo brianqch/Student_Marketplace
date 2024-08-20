@@ -51,7 +51,7 @@ export default function NewNavbar() {
       options: {
         queryParams: {
           access_type: 'offline',
-          prompt: 'consent',
+          prompt: 'consent', //Turn off for login
         },
       },
     });
@@ -120,12 +120,17 @@ export default function NewNavbar() {
                 {/* Divider */}
                 <div className="h-7 border-l-2 border-gray-300 mx-2"></div>
                 {/* Divider */}
-                <Link href="/login" className="hover:text-indigo-600 text-gray-700">Log In</Link>
-                <button
-                  className="border-2 border-slate-950 bg-[#432d2d] text-white flex items-center justify-center whitespace-nowrap min-w-[100px] px-4 py-2 text-sm sm:text-base"
-                  onClick={handleSignInWithGoogle}
+                <button 
+                className="border-2 border-slate-950 text-[#432d2d] bg-white transition hover:bg-[#432d2d] hover:text-white flex items-center justify-center whitespace-nowrap min-w-[px] px-4 py-2 text-sm sm:text-base"
+                onClick={handleSignInWithGoogle}
                 >
-                  SIGN UP
+                  Log In
+                  </button>
+                <button
+                  className="border-2 border-slate-950 bg-[#432d2d] text-white transition hover:text-[#432d2d] hover:bg-white flex items-center justify-center whitespace-nowrap  px-4 py-2 text-sm sm:text-base"
+                  onClick={() => router.push("/join")}
+                >
+                  Sign Up
                 </button>
 
 

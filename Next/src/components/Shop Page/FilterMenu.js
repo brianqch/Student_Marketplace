@@ -221,7 +221,7 @@ export default function FilterMenu({ params }) {
                                                             id={`filter-mobile-${section.id}-${optionIdx}`}
                                                             name={`${section.id}[]`}
                                                             type="checkbox"
-                                                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                            className="h-4 w-4 rounded border-gray-300 text-uni-blue focus:ring-uni-blue"
                                                             onChange={() => handleCheckboxChange(section.id, option.value)}
 
                                                         />
@@ -307,9 +307,10 @@ export default function FilterMenu({ params }) {
                             <form className="hidden lg:block">
                                 <h3 className="sr-only">Categories</h3>
                                 <ul role="list" className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
+                                    
                                     {subCategories.map((category) => (
                                         <li key={category.name}>
-                                            <a href={category.href} className={`${upperCaseCategory == category.name ? 'text-indigo-500 font-bold' : 'hover:text-indigo-300'}`}>{category.name}</a>
+                                            <a href={category.href} className={`${upperCaseCategory == category.name ? 'text-uni-blue font-bold' : 'hover:text-indigo-300'}`}>{category.name}</a>
                                         </li>
                                     ))}
                                 </ul>
@@ -335,7 +336,7 @@ export default function FilterMenu({ params }) {
                                                             id={`filter-${section.id}-${optionIdx}`}
                                                             name={`${section.id}[]`}
                                                             type="checkbox"
-                                                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                                            className="h-4 w-4 border-gray-300 text-uni-blue focus:ring-uni-blue"
                                                             onChange={() => handleCheckboxChange(section.id, option.value)}
 
                                                         />
