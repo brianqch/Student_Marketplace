@@ -1,8 +1,14 @@
+import { useRouter } from 'next/navigation';
+
 export default function ProductCard(props) {
+  const router = useRouter();
+
 
   return (
-    <div className="relative aspect-h-1 aspect-w-1 w-full lg:aspect-none  bg-white bg-clip-border border border-black text-gray-700 transition-shadow duration-300 hover:shadow-right-bottom hover:shadow-gray-400 cursor-pointer">
-      
+    <div className="relative aspect-h-1 aspect-w-1 w-full lg:aspect-none bg-white bg-clip-border border border-black text-gray-700 transition-shadow duration-300 hover:shadow-right-bottom hover:shadow-gray-400 cursor-pointer on"
+      onClick={() => router.push(`/items/view/${props.item.id}`)}
+    >
+
       {/* SVG Icon */}
       <div className="absolute top-[-1.5rem] left-[-1.5rem] z-20 ">
         <img src="/vouched.svg" alt="Icon" className="h-16 w-16" />
@@ -10,7 +16,7 @@ export default function ProductCard(props) {
 
       {/* Image */}
       <div className="aspect-square mx-2 mt-2 overflow-hidden border border-black bg-white bg-clip-border text-gray-700">
-      <img
+        <img
           src={
             props.item.items_images.length > 0
               ? props.item.items_images[0].image_url_arr[0]
