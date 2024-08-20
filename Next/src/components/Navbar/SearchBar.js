@@ -34,6 +34,7 @@ export default function SearchBar({ initialProducts = [] }) {
                         condition,
                         description,
                         created_at,
+                        brand,
                         items_images (
                             image_url_arr
                         )

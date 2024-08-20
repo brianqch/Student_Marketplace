@@ -469,7 +469,7 @@ const CreateItem = ({ params }) => {
                                 </div>
                                 <div className="flex flex-row sm:flex-col">
                                     {(images.length > 0) ? (
-                                        <div className="flex flex-row sm:flex-col ml-4 gap-2">
+                                        <div className="flex flex-row sm:flex-col gap-2">
                                             {images.map((image, index) => (
                                                 <div key={index} className="relative w-20 h-20">
                                                     <img

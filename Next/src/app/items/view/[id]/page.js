@@ -4,9 +4,22 @@ import { useState, useEffect } from 'react';
 import supabase from '../../../../lib/supabase';
 import styles from '../../../../styles/ProductDetail.module.css'
 
+const DescriptionDiv = ({ label, labelInfo }) => {
+    return (
+        <div className="flex flex-row text-wrap w-full">
+            <span className="w-1/2 text-gray-400">{label}</span>
+            <span className="w-1/2 break-words"> {labelInfo} </span>
+        </div>
+    )
+}
+
 const ViewItem = ({ params }) => {
     const id = params.id;
     const router = useRouter();
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+
     const [form, setForm] = useState({
         title: "",
         price: "",
@@ -14,15 +27,47 @@ const ViewItem = ({ params }) => {
         category: "",
         condition: "",
         description: "",
-        brand: ""
+        brand: "",
+        items_images: []
     });
+
+    const handleThumbnailClick = (image, index) => {
+        setSelectedImage(image);
+        setCurrentIndex(index);
+    };
+
+
+    const handleNext = () => {
+        const nextIndex = (currentIndex + 1) % form.items_images[0].image_url_arr.length;
+        setCurrentIndex(nextIndex);
+        setSelectedImage(form.items_images[0].image_url_arr[nextIndex]);
+    };
+
+    const handlePrev = () => {
+        const prevIndex = (currentIndex - 1 + form.items_images[0].image_url_arr.length) % form.items_images[0].image_url_arr.length;
+        setCurrentIndex(prevIndex);
+        setSelectedImage(form.items_images[0].image_url_arr[prevIndex]);
+    };
 
     useEffect(() => {
         async function fetchData() {
             if (id) {
                 const { data: item, error } = await supabase
                     .from('items')
-                    .select('*')
+                    .select(`
+                        id,
+                        title,
+                        price,
+                        location,
+                        category,
+                        condition,
+                        description,
+                        created_at,
+                        brand,
+                        items_images (
+                            image_url_arr
+                        )
+                    `)
                     .eq('id', id)
                     .single();
 
@@ -32,6 +77,8 @@ const ViewItem = ({ params }) => {
                     return;
                 }
                 setForm(item);
+                setSelectedImage(item.items_images[0].image_url_arr[0]);
+
             } else {
                 // Handle case when id is null or undefined
                 console.log('ID is null or undefined');
@@ -41,56 +88,110 @@ const ViewItem = ({ params }) => {
     }, [id, router]);
 
     return (
-        <section className="py-10 lg:py-24 relative">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <p className="font-medium text-lg text-indigo-600 ">Travel / Menswear</p>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-                    <div className="pro-detail w-full flex flex-col justify-center order-last lg:order-none max-lg:max-w-[608px] max-lg:mx-auto border-2">
+        <section className="py-8 font-palanquin flex flex-col sm:flex-row justify-center">
+            <div className="px-4 sm:px-6 lg:px-8 lg:w-[35vw] max-w-[700px] max-h-[700px]">
+                <span className="text-sm text-gray-500">
+                    <a href="/" className="hover:underline">HOME</a>
+                    <span> / </span>
+                    <a href="/shop" className="hover:underline">SHOP</a>
+                    <span> / </span>
+                    <a href={`/shop/${form.category}`} className="hover:underline">{form.category.toUpperCase()}</a>
+                </span>
 
-                        <div className='border-b-2 w-full h-full px-4 py-6'>
-                            <h2 className="mb-2 font-manrope font-bold text-3xl leading-10 text-gray-900">{form.title}</h2>
-                            <div className="flex flex-col sm:flex-row sm:items-center mb-6">
-                                <h6 className="font-manrope font-semibold text-2xl leading-9 text-gray-900 pr-5 mr-5">
+                <div className="gap-8 lg:gap-16">
+                    <div className="pro-detail w-full flex flex-col justify-center order-last lg:order-none max-lg:max-w-[608px] max-lg:mx-auto border-2 border-slate-900">
+
+                        <div className='border-b-2 border-slate-900	w-full h-full px-4 py-5'>
+                            <span className="text-2xl text-gray-900">{form.title}</span>
+                            <div className="flex flex-col sm:flex-row sm:items-center">
+                                <span className="text-2xl leading-9 text-gray-900 pr-5 mr-5">
                                     ${form.price}
-                                </h6>
-                                {/* <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-1">
-                                    {[...Array(5)].map((_, index) => (
-                                        <svg key={index} width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <g clipPath="url(#clip0_12029_1640)">
-                                                <path
-                                                    d="M9.10326 2.31699C9.47008 1.57374 10.5299 1.57374 10.8967 2.31699L12.7063 5.98347C12.8519 6.27862 13.1335 6.48319 13.4592 6.53051L17.5054 7.11846C18.3256 7.23765 18.6531 8.24562 18.0596 8.82416L15.1318 11.6781C14.8961 11.9079 14.7885 12.2389 14.8442 12.5632L15.5353 16.5931C15.6754 17.41 14.818 18.033 14.0844 17.6473L10.4653 15.7446C10.174 15.5915 9.82598 15.5915 9.53466 15.7446L5.91562 17.6473C5.18199 18.033 4.32456 17.41 4.46467 16.5931L5.15585 12.5632C5.21148 12.2389 5.10393 11.9079 4.86825 11.6781L1.94038 8.82416C1.34687 8.24562 1.67438 7.23765 2.4946 7.11846L6.54081 6.53051C6.86652 6.48319 7.14808 6.27862 7.29374 5.98347L9.10326 2.31699Z"
-                                                    fill={index < 4 ? "#FBBF24" : "#F3F4F6"} />
-                                            </g>
-                                            <defs>
-                                                <clipPath id="clip0_12029_1640">
-                                                    <rect width="20" height="20" fill="white" />
-                                                </clipPath>
-                                            </defs>
-                                        </svg>
-                                    ))}
-                                </div>
-                                <span className="pl-2 font-normal leading-7 text-gray-500 text-sm">1624 reviews</span>
-                            </div> */}
+                                </span>
+
                             </div>
-                            <p className="text-gray-500 text-base font-normal">
-                                the perfect companion for your next adventure! Embrace the spirit of sunny escapades with this
-                                vibrant and versatile bag designed to cater to your travel needs while adding a pop of color to
-                                your journey.
+                            <p className="font-palanquin text-gray-900 text-base font-normal mt-2">
+                                {form.description}
                             </p>
                         </div>
 
-                        <div className='border-b-2 w-full h-full px-4 py-6'>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="bg-gray-200 p-4">Column 1</div>
-                                <div className="bg-gray-300 p-4">Column 2</div>
+                        <div className="flex w-full h-full">
+                            <div className="flex flex-row w-full relative px-6 pt-4 pb-6">
+                                {/* Details */}
+                                <div className="flex flex-col gap-1 w-7/12 justify-center">
+                                    <span>DETAILS</span>
+                                    <DescriptionDiv label={"Condition"} labelInfo={form.condition} />
+                                    <DescriptionDiv label={"Category"} labelInfo={form.category} />
+                                    <DescriptionDiv label={"Region"} labelInfo={form.location} />
+                                    <DescriptionDiv label={"Brand"} labelInfo={form.brand} />
+
+                                </div>
+
+                                {/* Separator */}
+                                <div className="absolute inset-y-0 pr-2 left-[58.333333%] border-r-2 border-slate-900"></div>
+
+                                {/* Seller */}
+                                <div className="flex flex-col w-5/12 pl-10 gap-3">
+                                    <span>SELLER</span>
+                                    <div className="flex flex-row gap-2">
+                                        <img className="rounded-full w-10 h-10 aspect-square" src="/images/missing.jpg">
+                                        </img>
+                                        <div className="flex flex-col overflow-hidden">
+                                            <span className="text-sm">Username</span>
+                                            <span className="text-xs">Usertag</span>
+                                        </div>
+                                    </div>
+                                    {/* Rating */}
+                                    <div className="flex items-center gap-2 overflow-y-auto">
+                                        <div className="flex items-center gap-1">
+                                            {[...Array(5)].map((_, index) => (
+                                                <svg
+                                                    key={index}
+                                                    width="20"
+                                                    height="20"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="stroke-black" // Add a class for styling the stroke
+                                                >
+                                                    <path
+                                                        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                                                        fill={index < 4 ? "#FBBF24" : "#F3F4F6"}
+                                                        stroke="black" // Add stroke color
+                                                        strokeWidth="1" // Adjust stroke width as needed
+                                                    />
+                                                </svg>
+                                            ))}
+                                        </div>
+                                        <span className="font-normal leading-7 text-gray-500 text-sm overflow-hidden">(1624)</span>
+                                    </div>
+
+
+                                    <button className="px-2 py-1 bg-uni-blue text-white text-xs border-2 border-gray-900 hover:bg-uni-blue transition-colors duration-150 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        Ask a question
+                                    </button>
+                                </div>
                             </div>
-                            <p className="text-gray-500 text-base font-normal mb-8">
-                                the perfect companion for your next adventure! Embrace the spirit of sunny escapades with this
-                                vibrant and versatile bag designed to cater to your travel needs while adding a pop of color to
-                                your journey.
-                            </p>
                         </div>
+
+                        <div className="Flex flex-row w-full border-t-2 border-gray-900">
+                            <button className="border-r-2 w-1/2 px-10 py-4 border-gray-900 hover:bg-uni-blue transition-colors duration-150"
+                            >
+                                BUY NOW
+                            </button>
+                            <button className="w-1/2 px-10 py-4 border-gray-900 hover:bg-uni-blue transition-colors duration-150"
+                            >
+                                SEND OFFER
+                            </button>
+                        </div>
+
+                        <button className="border-t-2 border-gray-900 w-full px-10 py-4 bg-uni-blue text-white hover:bg-blue-500 transition-colors duration-150"
+                        >
+                            ADD TO CART
+                        </button>
+
+
+
+
                         {/* <div className="block w-full">
                             <p className="font-medium text-lg leading-8 text-gray-900 mb-4">Bag Color</p>
                             <div className="flex items-center justify-start gap-3 md:gap-6 relative mb-6">
@@ -123,6 +224,65 @@ const ViewItem = ({ params }) => {
                                 </div>
                             </div>
                         </div> */}
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div className="flex flex-col">
+                    <div className="flex flex-col lg:flex-row gap-2 mt-1 pt-5">
+                        {/* Image Preview */}
+                        {form.items_images.length > 0 ?
+                            <div className="relative aspect-square sm:w-[30vw] max-w-[700px] max-h-[700px] bg-gray-100 flex items-center justify-center">
+                                <img
+                                    src={selectedImage}
+                                    alt="preview"
+                                    className="w-full h-full object-cover"
+                                />
+                                {/* Arrows */}
+                                <button
+                                    onClick={handlePrev}
+                                    className="absolute text-4xl left-0 top-1/2 transform -translate-y-1/2 text-white p-2"
+                                >
+                                    &lt;
+                                </button>
+                                <button
+                                    onClick={handleNext}
+                                    className="absolute text-4xl right-0 top-1/2 transform -translate-y-1/2 text-white p-2"
+                                >
+                                    &gt;
+                                </button>
+                            </div>
+                            :
+                            <img
+                                src='/images/missing.jpg'
+                                alt="preview"
+                                className="w-full h-full object-cover aspect-square sm:w-[30vw] max-w-[700px] max-h-[700px]"
+                            />
+
+                        }
+
+                        {/* Thumbnails */}
+                        <div className="flex flex-row sm:flex-col gap-2">
+                            {form.items_images.length > 0 ? (
+                                form.items_images[0].image_url_arr.map((image, index) => (
+                                    <div key={index} className="relative w-20 h-20">
+                                        <img
+                                            src={image}
+                                            alt={`preview-${index}`}
+                                            className={`w-full h-full aspect-square object-cover hover:cursor-pointer ${index === currentIndex ? 'border-2 border-uni-blue' : ''}`}
+                                            onClick={() => handleThumbnailClick(image, index)}
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <img
+                                    src='/images/missing.jpg'
+                                    alt="preview"
+                                    className="relative w-20 h-20 bg-gray-100 border border-gray-300 flex items-center justify-center text-2xl text-gray-500"
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

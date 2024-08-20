@@ -2,6 +2,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import supabase from '../../../../lib/supabase';
+import imageCompression from 'browser-image-compression'; // Import the image compression library
 
 const EditItem = ({ params }) => {
     const [form, setForm] = useState({
@@ -39,6 +40,7 @@ const EditItem = ({ params }) => {
     const categoryDropdownRef = useRef(null);
     const conditionDropdownRef = useRef(null);
     const fileInputRef = useRef(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     const filteredCategories = categories.filter((item) =>
         item.toLowerCase().includes(categoryVal.toLowerCase())
@@ -65,12 +67,13 @@ const EditItem = ({ params }) => {
         setShowConditionDropdown(false);
     };
 
-    const handleThumbnailClick = (image) => {
+    const handleThumbnailClick = (image, index) => {
         setSelectedImage(image);
+        setCurrentIndex(index);
     };
 
-    const handleImageRemove = (index) => {
 
+    const handleImageRemove = (index) => {
 
         setImages((prevImages) => {
             const updatedImages = [...prevImages];
@@ -98,6 +101,7 @@ const EditItem = ({ params }) => {
                         condition,
                         description,
                         created_at,
+                        brand,
                         items_images (
                             image_url_arr
                         )
@@ -167,18 +171,21 @@ const EditItem = ({ params }) => {
     }
 
     async function handleImageUpload(e) {
-        const files = e.target.files;
+        const files = Array.from(e.target.files);
         const uploadedUrls = [];
 
         for (const file of files) {
             // Create a URL for the file using URL.createObjectURL
-            const url = URL.createObjectURL(file);
-            uploadedUrls.push(url);
+            // const url = URL.createObjectURL(file);
+            uploadedUrls.push(file);
         }
+        console.log(uploadedUrls)
         setImages([...images, ...uploadedUrls]);
 
         if (uploadedUrls.length > 0) {
-            setSelectedImage(uploadedUrls[uploadedUrls.length - 1]); // Set the first uploaded image as selected
+            setSelectedImage(URL.createObjectURL(uploadedUrls[uploadedUrls.length - 1])); // Set the first uploaded image as selected
+        } else {
+            setSelectedImage(null); // No images left, clear selection
         }
 
 
@@ -209,6 +216,7 @@ const EditItem = ({ params }) => {
     };
 
     const uploadImagesToS3 = async (images) => {
+        console.log(images)
         const imageUrls = [];
 
         for (const file of images) {
@@ -294,14 +302,15 @@ const EditItem = ({ params }) => {
                 const newImageUrls = await uploadImagesToS3(compressedImages);
 
                 imageUrls = [...imageUrls, ...newImageUrls];
+                console.log(imageUrls)
             }
+
 
             const { data, error: imagesUpdateError } = await supabase
                 .from('items_images')
                 .update({ image_url_arr: imageUrls })
                 .eq('item_id', id)
                 .select()
-
 
 
             if (imagesUpdateError) {
@@ -547,14 +556,14 @@ const EditItem = ({ params }) => {
                             {/* Thumbnails */}
                             <div className="flex flex-row sm:flex-col">
                                 {images.length > 0 ? (
-                                    <div className="flex flex-row sm:flex-col ml-4 gap-2">
+                                    <div className="flex flex-row sm:flex-col gap-2">
                                         {images.map((image, index) => (
                                             <div key={index} className="relative w-20 h-20">
                                                 <img
                                                     src={image}
                                                     alt={`preview-${index}`}
-                                                    className="w-full h-full aspect-square object-cover hover:cursor-pointer"
-                                                    onClick={() => handleThumbnailClick(image)}
+                                                    className={`w-full h-full aspect-square object-cover hover:cursor-pointer ${index === currentIndex ? 'border-2 border-uni-blue' : ''}`}
+                                                    onClick={() => handleThumbnailClick(image, index)}
                                                 />
                                                 <button
                                                     type="button"

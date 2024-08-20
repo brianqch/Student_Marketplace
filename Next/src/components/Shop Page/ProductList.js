@@ -27,6 +27,7 @@ export default function ProductList({ category, categoryTitle, page, pageSize, f
                         condition,
                         description,
                         created_at,
+                        brand,
                         items_images (
                             image_url_arr
                         )
