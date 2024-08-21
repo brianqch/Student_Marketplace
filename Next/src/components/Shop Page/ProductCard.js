@@ -3,6 +3,8 @@ import { useRouter } from 'next/navigation';
 export default function ProductCard(props) {
   const router = useRouter();
 
+  console.log(props);
+
 
   return (
     <div className="relative aspect-h-1 aspect-w-1 w-full lg:aspect-none bg-white bg-clip-border border border-black text-gray-700 transition-shadow duration-300 hover:shadow-right-bottom hover:shadow-gray-400 cursor-pointer on"

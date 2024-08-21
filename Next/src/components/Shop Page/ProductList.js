@@ -97,6 +97,7 @@ export default function ProductList({ category, categoryTitle, page, pageSize, f
 
         fetchItems();
     }, [category, page, filters]);
+    
 
 
     return (
