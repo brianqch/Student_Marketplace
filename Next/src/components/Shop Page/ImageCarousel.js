@@ -17,11 +17,6 @@ async function fetchData() {
         .select(`
             id,
             title,
-            price,
-            location,
-            category,
-            condition,
-            description,
             created_at,
             items_images (
                 image_url_arr
@@ -41,8 +36,14 @@ async function fetchData() {
 
 
 function getTimeAgo(createdAt) {
-    const now = new Date();
-    const timestamp = new Date(createdAt);
+    const now = new Date().getTime(); // Get current time in milliseconds
+    const timestamp = new Date(createdAt).getTime(); // Convert createdAt to milliseconds
+
+    // Check if the timestamp is in the future
+    if (timestamp > now) {
+        return 'Just now';
+    }
+
     const seconds = Math.floor((now - timestamp) / 1000);
 
     if (seconds < 60) {
@@ -58,6 +59,7 @@ function getTimeAgo(createdAt) {
         return `${days} day(s) ago`;
     }
 }
+
 
 export default async function ImageCarousel() {
     const data = await fetchData();
@@ -86,7 +88,8 @@ export default async function ImageCarousel() {
                                         />
                                     </CardContent>
                                 </Card>
-                                <p className="pt-1 text-[14px] text-[#959595]">{getTimeAgo(item.created_at)}</p>
+                                <p className="pt-1 text-sm text-gray-400">{item.title}</p>
+                                <p className="text-sm text-gray-400">{getTimeAgo(item.created_at)}</p>
                             </div>
                         </CarouselItem>
                     ))
