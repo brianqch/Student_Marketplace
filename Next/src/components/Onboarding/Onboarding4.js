@@ -51,7 +51,6 @@ const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, se
     };
 
 
-
     const handleSignUp = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
@@ -82,15 +81,20 @@ const Onboarding4 = ({ firstName, setFirstName, lastName, setLastName, email, se
     };
 
     const handleGoogleSignUp = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'consent', //Turn off for login
+            },
+          },
         });
-
+    
         if (error) {
-            console.log(error);
-            setError(error.message);
+          console.error('OAuth sign-in error:', error);
         }
-    };
+      };
 
     useEffect(() => {
         const checkUser = async () => {

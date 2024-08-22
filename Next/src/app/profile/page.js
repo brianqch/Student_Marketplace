@@ -10,26 +10,25 @@ export default function Profile() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const user = (await supabase.auth.getUser()).data.user;
+
+                const { data, userError } = await supabase.auth.getSession();
+                const user = data?.session?.user;
+
 
                 const { data: userPublic, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('id', user.id);
-            
-                
+                    .from('users')
+                    .select('*')
+                    .eq('id', user.id);
+
+
                 setUserData({
                     ...user,
                     ...userPublic[0]
                 });
 
-                const listingIds = userPublic[0]?.listing_ids || [];
-
-                if (listingIds.length > 0) {
-                    // Fetch user's listings based on listing_ids
-                    const { data: listings, error: listingsError } = await supabase
-                        .from('items')
-                        .select(`
+                const { data: listings, error: listingsError } = await supabase
+                    .from('items')
+                    .select(`
                             id,
                             title,
                             price,
@@ -41,14 +40,14 @@ export default function Profile() {
                             brand,
                             items_images (
                                 image_url_arr
-                            )
+                            ),
+                            user_id
                         `)
-                        .in('id', listingIds);
+                    .eq('user_id', user.id);
 
-                    if (listingsError) throw listingsError;
+                if (listingsError) throw listingsError;
 
-                    setUserListings(listings);
-                }
+                setUserListings(listings);
 
             } catch (error) {
                 console.error('Error:', error.message);
@@ -57,8 +56,6 @@ export default function Profile() {
         fetchUserData();
     }, [])
 
-    console.log(userData);
-    console.log(userListings);
 
     return (
         <>
@@ -73,7 +70,7 @@ export default function Profile() {
                             <div className="flex flex-wrap py-5">
                                 {userListings.length > 0 ? (
                                     userListings.map((item) => (
-                                        
+
                                         <ProductCard key={item.id} item={item} />
                                         // <div></div>
                                     ))

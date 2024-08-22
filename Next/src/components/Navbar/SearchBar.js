@@ -1,26 +1,21 @@
+"use client";
+
 import React, { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
-import { HiOutlineMenuAlt4 } from "react-icons/hi";
-import { FaSearch, FaUser, FaCaretDown, FaShoppingCart } from "react-icons/fa";
-import Flex from "./Flex";
-import { BsSuitHeartFill } from "react-icons/bs";
-import useRouter from "next/router";
-import Link from "next/link";
+import { FaSearch } from "react-icons/fa";
+import { useRouter } from 'next/navigation';
 import supabase from "../../lib/supabase";
 
 export default function SearchBar({ initialProducts = [] }) {
     const [items, setItems] = useState(initialProducts);
     const [filteredItems, setFilteredItems] = useState([]);
     const [show, setShow] = useState(false);
-    const [showUser, setShowUser] = useState(false);
     const [placeholder, setPlaceholder] = useState(`Search for "Gray sectional couch"`);
-    const router = useRouter;
+    const router = useRouter();
     const ref = useRef();
-    const paginationItems = [];
+    const inputRef = useRef(null);
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
-        // Fetch items once when the component mounts
         const fetchItems = async () => {
             try {
                 const { data: items, error: itemsError } = await supabase
@@ -45,7 +40,7 @@ export default function SearchBar({ initialProducts = [] }) {
                     setItems([]);
                 } else {
                     setItems(items);
-                    setFilteredItems(items); // Initially set filtered items to all items
+                    setFilteredItems(items);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -54,10 +49,15 @@ export default function SearchBar({ initialProducts = [] }) {
         };
 
         fetchItems();
+        updatePlaceholder();
+        window.addEventListener("resize", updatePlaceholder);
+
+        return () => {
+            window.removeEventListener("resize", updatePlaceholder);
+        };
     }, []);
 
     useEffect(() => {
-        // Filter items locally based on searchQuery
         const keywords = searchQuery.trim().split(/\s+/);
         const filtered = items.filter(item =>
             keywords.every(keyword =>
@@ -67,23 +67,24 @@ export default function SearchBar({ initialProducts = [] }) {
         setFilteredItems(filtered);
     }, [searchQuery, items]);
 
-
     useEffect(() => {
-        document.body.addEventListener("click", (e) => {
-            if (ref.current && ref.current.contains(e.target)) {
-                setShow(true);
-            } else {
+        const handleClickOutside = (e) => {
+            if (ref.current && !ref.current.contains(e.target)) {
                 setShow(false);
             }
-        });
-    }, [show, ref]);
-    const [showSearchBar, setShowSearchBar] = useState(false);
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [ref]);
 
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
+        setShow(true);
     };
-
-    const inputRef = useRef(null);
 
     const updatePlaceholder = () => {
         if (inputRef.current) {
@@ -95,19 +96,10 @@ export default function SearchBar({ initialProducts = [] }) {
                 setPlaceholder(`Search for "Gray sectional couch"`);
             }
         }
-    }
-
-    useEffect(() => {
-        updatePlaceholder();
-        window.addEventListener("resize", updatePlaceholder);
-
-        return () => {
-            window.removeEventListener("resize", updatePlaceholder);
-        };
-    }, []);
+    };
 
     return (
-        <div className="relative w-full white flex items-center justify-between px-6 rounded-full">
+        <div ref={ref} className="relative w-full white flex items-center justify-between px-6 rounded-full">
             <div className="flex-1 rounded-full relative border-2 border-gray-200 transition-colors duration-300 ease-in-out focus-within:border-[#0064fa]">
                 <input
                     className="w-full outline-0 placeholder:text-[#C4C4C4] placeholder:text-[14px] bg-transparent focus:ring-0 border-0"
@@ -125,27 +117,22 @@ export default function SearchBar({ initialProducts = [] }) {
                     <FaSearch className="w-5 h-5" />
                 </button>
             </div>
-            {searchQuery && (
+            {searchQuery && show && (
                 <div
-                    className={`w-full mx-auto h-96 bg-white top-16 absolute left-0 z-50 overflow-y-scroll shadow-2xl scrollbar-hide cursor-pointer`}
+                    className={`w-full mx-auto bg-white top-12 absolute left-0 z-50 overflow-y-scroll shadow-2xl scrollbar-hide cursor-pointer`}
                 >
                     {searchQuery &&
                         filteredItems.map((item) => (
                             <div
-                                onClick={() =>
-                                    router.push(
-                                        `/product/${item.productName
-                                            .toLowerCase()
-                                            .split(" ")
-                                            .join("")}`
-                                    ) &
-                                    setShowSearchBar(true) &
-                                    setSearchQuery("")
-                                }
+                                onClick={() => {
+                                    router.push(`/items/view/${item.id}`);
+                                    setShow(true);
+                                    setSearchQuery("");
+                                }}
                                 key={item.id}
-                                className="max-w-[600px] h-28 bg-gray-100 mb-3 flex items-center gap-3"
+                                className="h-24 border-2 flex items-center gap-3 hover:bg-gray-200"
                             >
-                                <img className="w-24" src={item.items_images[0].image_url_arr} alt="productImg" />
+                                <img className="w-24 aspect-square" src={item.items_images[0].image_url_arr.length > 0 ? item.items_images[0].image_url_arr[0] : "/images/missing.jpg"} />
                                 <div className="flex flex-col gap-1">
                                     <p className="font-semibold text-lg">
                                         {item.title}

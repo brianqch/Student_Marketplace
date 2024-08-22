@@ -107,7 +107,7 @@ export default function ProductList({ category, categoryTitle, page, pageSize, f
                 {categoryTitle}
                 <span className="text-gray-600"> ({items ? items.length : 0} items)</span>
             </span>
-            <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {items.map((item) => (
                     <ProductCard
                         key={item.id}

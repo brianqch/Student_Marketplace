@@ -96,9 +96,6 @@ export default function FilterMenu({ params }) {
         },
     ]);
 
-    // if (params) {
-    //     console.log((params.category).charAt(0).toUpperCase() + (params.category).slice(1));
-    // }
 
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
     const [items, setItems] = useState([]);
@@ -107,7 +104,7 @@ export default function FilterMenu({ params }) {
     const categoryTitle = category ? upperCaseCategory : "All Products";
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1); // Track the current page
-    const pageSize = 4; // Number of items per page
+    const pageSize = 8; // Number of items per page
     const [totalPages, setTotalPages] = useState(1); // Total number of pages
 
     const fetchTotalItemsCount = async () => {
@@ -302,12 +299,12 @@ export default function FilterMenu({ params }) {
                             Products
                         </h2>
 
-                        <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+                        <div className="grid grid-cols-1 gap-x-8 gap-y-8 lg:grid-cols-4">
                             {/* Filters */}
                             <form className="hidden lg:block">
                                 <h3 className="sr-only">Categories</h3>
                                 <ul role="list" className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
-                                    
+
                                     {subCategories.map((category) => (
                                         <li key={category.name}>
                                             <a href={category.href} className={`${upperCaseCategory == category.name ? 'text-uni-blue font-bold' : 'hover:text-indigo-300'}`}>{category.name}</a>
@@ -353,19 +350,25 @@ export default function FilterMenu({ params }) {
 
 
                             {/* Product grid */}
-                            <div className="lg:col-span-3 relative">  {/* Add relative positioning here */}
-                                <div className="bg-white h-full">  {/* Ensure this container takes full height */}
-                                    <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                                        <ProductList category={category} categoryTitle={categoryTitle} page={page} pageSize={pageSize} filters={filters} />
+                            <div className="lg:col-span-3">
+                                <div className="bg-white flex flex-col justify-between">  {/* Use flexbox to arrange content */}
+                                    <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 flex-grow">
+                                        <ProductList
+                                            category={category}
+                                            categoryTitle={categoryTitle}
+                                            page={page}
+                                            pageSize={pageSize}
+                                            filters={filters}
+                                        />
+                                    </div>
 
-                                        {/* Pagination */}
-                                        <div className="absolute bottom-0 right-0 mb-4 mr-4">  {/* Positioning the pagination */}
-                                            <PaginationComponent
-                                                totalPages={totalPages}
-                                                currentPage={page}
-                                                handlePageChange={handlePageChange}
-                                            />
-                                        </div>
+                                    {/* Pagination */}
+                                    <div className="flex justify-end mr-8">  
+                                        <PaginationComponent
+                                            totalPages={totalPages}
+                                            currentPage={page}
+                                            handlePageChange={handlePageChange}
+                                        />
                                     </div>
                                 </div>
                             </div>

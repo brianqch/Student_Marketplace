@@ -20,7 +20,7 @@ export default function ProductCard(props) {
       <div className="aspect-square mx-2 mt-2 overflow-hidden border border-black bg-white bg-clip-border text-gray-700">
         <img
           src={
-            props.item.items_images.length > 0
+            props.item.items_images[0].image_url_arr.length > 0
               ? props.item.items_images[0].image_url_arr[0]
               : '/images/missing.jpg'
           }
