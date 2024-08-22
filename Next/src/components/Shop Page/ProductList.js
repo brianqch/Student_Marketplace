@@ -115,11 +115,11 @@ export default function ProductList({ category, categoryTitle, page, pageSize, f
             </span>
             <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {items.map((item) => (
-                    // <ProductCard
-                    //     key={item.id}
-                    //     item={item}
-                    // />
-                    <PreloadProductCard/>
+                    <ProductCard
+                        key={item.id}
+                        item={item}
+                    />
+                    // <PreloadProductCard/>
                 ))}
             </div>
 
