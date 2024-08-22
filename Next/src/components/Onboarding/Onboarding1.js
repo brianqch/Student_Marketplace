@@ -1,7 +1,6 @@
-"use client";
-import React, { useState } from "react";
+import React from "react";
 import { PiHandWavingFill } from "react-icons/pi";
-import { AiOutlineShop, AiOutlineShoppingCart } from "react-icons/ai";
+import { AiOutlineShoppingCart } from "react-icons/ai";
 
 export default function Onboarding1({ step, setStep, firstName, setFirstName, error, setError, activeButton, setActiveButton }) {
 

@@ -134,7 +134,7 @@ const EditItem = ({ params }) => {
                     }
                 }
 
-                
+
 
                 setCategoryVal(item.category);
 
@@ -353,7 +353,7 @@ const EditItem = ({ params }) => {
 
     return (
         <div>
-            <h2 className="text-xl font-semibold p-4">Product Listing Edit</h2>
+            <h2 className="text-xl font-semibold p-4 pl-20">Product Listing Edit</h2>
 
             <div className="flex flex-col lg:flex-row gap-8 justify-center">
                 {/* Form Section */}
@@ -420,31 +420,29 @@ const EditItem = ({ params }) => {
                             <div className="sm:col-span-4 w-full sm:w-1/3">
                                 <div className="relative flex flex-col gap-1">
                                     <label htmlFor="category" className="block text-md leading-6 text-slate-900">Category</label>
-                                    <div ref={categoryDropdownRef}>
-                                        <div className="relative flex items-center">
-                                            <input
-                                                type="text"
-                                                id="category"
-                                                placeholder="Select category"
-                                                className="flex-1 border-2 border-slate-400 bg-transparent p-3 text-slate-900 transition focus:ring-4 focus-within:ring-uni-blue"
-                                                value={categoryVal}
-                                                onChange={handleCategoryInputChange}
-                                                onFocus={() => setShowCategoryDropdown(true)}
-                                            />
-                                            {showCategoryDropdown && filteredCategories.length > 0 && (
-                                                <div className="absolute z-10 mt-2 max-h-60 w-full overflow-auto bg-white border border-gray-300 shadow-lg">
-                                                    {filteredCategories.map((item) => (
-                                                        <div
-                                                            key={item}
-                                                            onClick={() => handleCategoryItemClick(item)}
-                                                            className="cursor-pointer p-2 hover:bg-gray-100"
-                                                        >
-                                                            {item}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
+                                    <div ref={categoryDropdownRef} className="relative">
+                                        <input
+                                            type="text"
+                                            id="category"
+                                            placeholder="Select category"
+                                            className="flex-1 border-2 border-slate-400 bg-transparent p-3 text-slate-900 transition focus:ring-4 focus-within:ring-uni-blue"
+                                            value={categoryVal}
+                                            onChange={handleCategoryInputChange}
+                                            onFocus={() => setShowCategoryDropdown(true)}
+                                        />
+                                        {showCategoryDropdown && filteredCategories.length > 0 && (
+                                            <div className="absolute z-20 mt-2 max-h-60 w-full overflow-auto bg-white border border-gray-300 shadow-lg">
+                                                {filteredCategories.map((item) => (
+                                                    <div
+                                                        key={item}
+                                                        onClick={() => handleCategoryItemClick(item)}
+                                                        className="cursor-pointer p-2 hover:bg-gray-100"
+                                                    >
+                                                        {item}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -453,34 +451,33 @@ const EditItem = ({ params }) => {
                             <div className="sm:col-span-4 w-full sm:w-1/3">
                                 <div className="relative flex flex-col gap-1">
                                     <label htmlFor="condition" className="block text-md leading-6 text-slate-900">Condition</label>
-                                    <div>
-                                        <div className="relative flex items-center">
-                                            <input
-                                                type="text"
-                                                id="condition"
-                                                placeholder="Select condition"
-                                                className="flex-1 border-2 border-slate-400 bg-transparent p-3 text-slate-900 transition focus:ring-4 focus-within:ring-uni-blue"
-                                                value={form.condition}
-                                                onClick={handleConditionToggleDropdown}
-                                                readOnly
-                                            />
-                                            {showConditionDropdown && (
-                                                <div ref={conditionDropdownRef} className="absolute z-10 mt-2 max-h-60 w-full overflow-auto bg-white border border-gray-300 shadow-lg">
-                                                    {conditions.map((item) => (
-                                                        <div
-                                                            key={item}
-                                                            onClick={() => handleConditionItemClick(item)}
-                                                            className="cursor-pointer p-2 hover:bg-gray-100"
-                                                        >
-                                                            {item}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
+                                    <div ref={conditionDropdownRef} className="relative">
+                                        <input
+                                            type="text"
+                                            id="condition"
+                                            placeholder="Select condition"
+                                            className="flex-1 border-2 border-slate-400 bg-transparent p-3 text-slate-900 transition focus:ring-4 focus-within:ring-uni-blue"
+                                            value={form.condition}
+                                            onClick={handleConditionToggleDropdown}
+                                            readOnly
+                                        />
+                                        {showConditionDropdown && (
+                                            <div className="absolute z-20 mt-2 max-h-60 w-full overflow-auto bg-white border border-gray-300 shadow-lg">
+                                                {conditions.map((item) => (
+                                                    <div
+                                                        key={item}
+                                                        onClick={() => handleConditionItemClick(item)}
+                                                        className="cursor-pointer p-2 hover:bg-gray-100"
+                                                    >
+                                                        {item}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
+
 
                             {/* Location */}
                             <div className="w-full sm:w-1/3">
@@ -514,12 +511,12 @@ const EditItem = ({ params }) => {
                         </div>
                         <div className="flex justify-start">
 
-                        <button
-                            type="submit"
-                            className="w-auto px-4 py-2 bg-blue-500 text-white"
+                            <button
+                                type="submit"
+                                className="w-auto px-4 py-2 bg-blue-500 text-white"
                             >
-                            Update Item
-                        </button>
+                                Update Item
+                            </button>
                         </div>
                     </form>
                 </div>

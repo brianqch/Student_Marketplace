@@ -46,6 +46,8 @@ const CreateItem = ({ params }) => {
         "Video Games & Consoles"
     ];
 
+    
+
     const categoryDropdownRef = useRef(null);
     const conditionDropdownRef = useRef(null);
 
@@ -252,8 +254,8 @@ const CreateItem = ({ params }) => {
 
     return (
         <div>
-            <h2 className="text-xl font-semibold p-4">Product Listing</h2>
             <form onSubmit={onSubmit}>
+            <h2 className="text-xl font-semibold p-4 pl-20">Product Listing</h2>
                 <div className="flex flex-col lg:flex-row gap-8 justify-center">
                     {/* Details Section */}
                     <div className="flex flex-col w-full max-w-2xl gap-4">

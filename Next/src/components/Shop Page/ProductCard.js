@@ -12,9 +12,9 @@ export default function ProductCard(props) {
     >
 
       {/* SVG Icon */}
-      <div className="absolute top-[-1.5rem] left-[-1.5rem] z-20 ">
+      {/* <div className="absolute top-[-1.5rem] left-[-1.5rem] z-20 ">
         <img src="/vouched.svg" alt="Icon" className="h-16 w-16" />
-      </div>
+      </div> */}
 
       {/* Image */}
       <div className="aspect-square mx-2 mt-2 overflow-hidden border border-black bg-white bg-clip-border text-gray-700">

@@ -107,17 +107,20 @@ export default function FilterMenu({ params }) {
     const pageSize = 8; // Number of items per page
     const [totalPages, setTotalPages] = useState(1); // Total number of pages
 
-    const fetchTotalItemsCount = async () => {
-        const { count } = await supabase
-            .from('items')
-            .select('*', { count: 'exact', head: true });
+    const fetchTotalItemsCount = (count) => {
+        // const { count } = await supabase
+        //     .from('items')
+        //     .select('*', { count: 'exact', head: true });
 
         const calculatedTotalPages = Math.ceil(count / pageSize);
         setTotalPages(calculatedTotalPages);
     };
 
     useEffect(() => {
-        fetchTotalItemsCount(); // Fetch total count on initial load
+        const { count } = supabase
+            .from('items')
+            .select('*', { count: 'exact', head: true });
+        fetchTotalItemsCount(count); // Fetch total count on initial load
     }, []);
 
 
@@ -245,8 +248,8 @@ export default function FilterMenu({ params }) {
                     <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
                         <h1 className="text-4xl font-bold tracking-tight text-gray-900">New Arrivals</h1>
 
-                        <div className="flex items-center">
-                            <Menu as="div" className="relative inline-block text-left">
+                        {/* <div className="flex items-center">
+                            <Menu as="div" className="relative inline-block text-left z-30">
                                 <div>
                                     <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
                                         Sort
@@ -291,7 +294,7 @@ export default function FilterMenu({ params }) {
                                 <span className="sr-only">Filters</span>
                                 <FunnelIcon aria-hidden="true" className="h-5 w-5" />
                             </button>
-                        </div>
+                        </div> */}
                     </div>
 
                     <section aria-labelledby="products-heading" className="pb-24 pt-6">
@@ -359,6 +362,7 @@ export default function FilterMenu({ params }) {
                                             page={page}
                                             pageSize={pageSize}
                                             filters={filters}
+                                            fetchTotalItemsCount={fetchTotalItemsCount}
                                         />
                                     </div>
 

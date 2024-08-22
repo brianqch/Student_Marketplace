@@ -232,7 +232,7 @@ const ViewItem = ({ params }) => {
                 <div className="flex flex-col">
                     <div className="flex flex-col lg:flex-row gap-2 mt-1 pt-5">
                         {/* Image Preview */}
-                        {form.items_images.length > 0 ?
+                        {(form.items_images.length > 0 && form.items_images[0].image_url_arr.length > 0) ?
                             <div className="relative aspect-square sm:w-[30vw] max-w-[700px] max-h-[700px] bg-gray-100 flex items-center justify-center">
                                 <img
                                     src={selectedImage}

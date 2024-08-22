@@ -70,13 +70,13 @@ export default async function ImageCarousel() {
                 align: "center",
                 loop: true,
             }}
-            className="w-full max-w-2xl max-h-xl"
+            className="w-[40vw] max-w-2xl max-h-xl"
         >
             <CarouselContent>
                 {data.length > 0 ? (
                     data.map((item, index) => (
                         <CarouselItem key={index} className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-                            <div className="p-1">
+                            <div className="p-1 flex flex-col">
                                 <Card className="w-full h-full flex flex-col"> {/* Added 'flex' and 'flex-col' */}
                                     <CardContent className="flex-1 p-0"> {/* Make the content area flexible */}
                                         <img
@@ -88,7 +88,7 @@ export default async function ImageCarousel() {
                                         />
                                     </CardContent>
                                 </Card>
-                                <p className="pt-1 text-sm text-gray-400">{item.title}</p>
+                                <p className="pt-1 text-sm text-gray-400 overflow-hidden whitespace-nowrap text-ellipsis">{item.title}</p>
                                 <p className="text-sm text-gray-400">{getTimeAgo(item.created_at)}</p>
                             </div>
                         </CarouselItem>

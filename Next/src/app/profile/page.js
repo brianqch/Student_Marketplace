@@ -67,7 +67,7 @@ export default function Profile() {
                         <span>{`Joined: ${new Date(userData.created_at).toLocaleDateString('en-US', { year: 'numeric', day: 'numeric', month: 'long' })}`}</span>
                         <div className="flex flex-col mt-4">
                             <span>Listings:</span>
-                            <div className="flex flex-wrap py-5">
+                            <div className="flex flex-wrap py-5 w-60">
                                 {userListings.length > 0 ? (
                                     userListings.map((item) => (
 
