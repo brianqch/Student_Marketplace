@@ -18,6 +18,7 @@ const ViewItem = ({ params }) => {
     const router = useRouter();
     const [selectedImage, setSelectedImage] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [seller, setSeller] = useState('');
 
 
     const [form, setForm] = useState({
@@ -28,12 +29,19 @@ const ViewItem = ({ params }) => {
         condition: "",
         description: "",
         brand: "",
-        items_images: []
+        items_images: [],
+        user_id: ""
     });
 
     const handleThumbnailClick = (image, index) => {
         setSelectedImage(image);
         setCurrentIndex(index);
+    };
+
+    const handleProfileClick = () => {
+        if (form.user_id) {
+            router.push(`/profile/${form.user_id}`);
+        }
     };
 
 
@@ -66,7 +74,8 @@ const ViewItem = ({ params }) => {
                         brand,
                         items_images (
                             image_url_arr
-                        )
+                        ),
+                        user_id
                     `)
                     .eq('id', id)
                     .single();
@@ -78,6 +87,41 @@ const ViewItem = ({ params }) => {
                 }
                 setForm(item);
                 setSelectedImage(item.items_images[0].image_url_arr[0]);
+
+                if (item.user_id) {
+                    // Fetch user information
+                    const { data: user, error: userError } = await supabase
+                        .from('users')
+                        .select('name')
+                        .eq('id', item.user_id)
+                        .single();
+                
+                    if (userError) {
+                        console.error('Error fetching user:', userError);
+                    } else {
+                        setSeller(user);
+                
+                        // Fetch review ratings for this user
+                        const { data: reviews, error: reviewsError } = await supabase
+                            .from('reviews')
+                            .select('rating')
+                            .eq('review_for', item.user_id);
+                
+                        if (reviewsError) {
+                            console.error('Error fetching reviews:', reviewsError);
+                        } else {
+                            // Handle the reviews data, for example, calculating the average rating
+                            const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+                            // console.log('Average rating:', averageRating);
+
+                            setSeller({
+                                ...user,
+                                averageRating
+                            })
+                        }
+                    }
+                }
+                
 
             } else {
                 // Handle case when id is null or undefined
@@ -132,11 +176,11 @@ const ViewItem = ({ params }) => {
                                 {/* Seller */}
                                 <div className="flex flex-col w-5/12 pl-10 gap-3">
                                     <span>SELLER</span>
-                                    <div className="flex flex-row gap-2">
+                                    <div className="flex flex-row gap-2" onClick={handleProfileClick}>
                                         <img className="rounded-full w-10 h-10 aspect-square" src="/images/missing.jpg">
                                         </img>
                                         <div className="flex flex-col overflow-hidden">
-                                            <span className="text-sm">Username</span>
+                                            <span className="text-sm">{seller.name}</span>
                                             <span className="text-xs">Usertag</span>
                                         </div>
                                     </div>
@@ -164,6 +208,7 @@ const ViewItem = ({ params }) => {
                                         </div>
                                         <span className="font-normal leading-7 text-gray-500 text-sm overflow-hidden">(1624)</span>
                                     </div>
+
 
 
                                     <button className="px-2 py-1 bg-uni-blue text-white text-xs border-2 border-gray-900 hover:bg-uni-blue transition-colors duration-150 hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500">

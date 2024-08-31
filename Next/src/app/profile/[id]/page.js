@@ -1,30 +1,32 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import supabase from "../../lib/supabase";
-import ProductCard from "../../components/Shop Page/ProductCard";
+import supabase from "../../../lib/supabase";
+import ProductCard from "../../../components/Shop Page/ProductCard";
 
-export default function Profile() {
+export default function Profile({params}) {
     const [userData, setUserData] = useState();
     const [userListings, setUserListings] = useState([]);
 
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-
-                const { data, userError } = await supabase.auth.getSession();
-                const user = data?.session?.user;
-
+                
+                const userId = params.id;
 
                 const { data: userPublic, error } = await supabase
                     .from('users')
                     .select('*')
-                    .eq('id', user.id);
+                    .eq('id', userId)
+                    .single();
 
+                if (error) throw error;
 
                 setUserData({
-                    ...user,
-                    ...userPublic[0]
+                    // ...user,
+                    ...userPublic
                 });
+
+                console.log(userPublic);
 
                 const { data: listings, error: listingsError } = await supabase
                     .from('items')
@@ -43,7 +45,7 @@ export default function Profile() {
                             ),
                             user_id
                         `)
-                    .eq('user_id', user.id);
+                    .eq('user_id', userId);
 
                 if (listingsError) throw listingsError;
 
@@ -64,7 +66,7 @@ export default function Profile() {
                     <div className="flex flex-col">
                         <span>{`Name: ${userData.name}`}</span>
                         <span>{`Email: ${userData.email}`}</span>
-                        <span>{`Joined: ${new Date(userData.created_at).toLocaleDateString('en-US', { year: 'numeric', day: 'numeric', month: 'long' })}`}</span>
+                        <span>{`Joined: ${new Date(userData.join_date).toLocaleDateString('en-US', { year: 'numeric', day: 'numeric', month: 'long' })}`}</span>
                         <div className="flex flex-col mt-4">
                             <span>Listings:</span>
                             <div className="flex flex-wrap py-5 w-60">
