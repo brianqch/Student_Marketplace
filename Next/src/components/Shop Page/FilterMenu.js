@@ -17,6 +17,7 @@ import {
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid'
 import ProductList from './ProductList';
+import ProductSkeleton from "./ProductSkeleton";
 import supabase from '../../lib/supabase'; // Adjust the path as needed
 import PaginationComponent from "../../components/Shop Page/PaginationComponent";
 
@@ -125,9 +126,9 @@ export default function FilterMenu({ params }) {
 
 
 
-    useEffect(() => {
-        setLoading(false);
-    }, []);
+    // useEffect(() => {
+    //     setLoading(false);
+    // }, []);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -154,11 +155,6 @@ export default function FilterMenu({ params }) {
             })
         );
     };
-
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
 
     return (
         <div className='z-15'>
@@ -245,7 +241,7 @@ export default function FilterMenu({ params }) {
 
 
                 <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24">
+                    <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24 min-h-full">
                         <h1 className="text-4xl font-bold tracking-tight text-gray-900">New Arrivals</h1>
 
                         {/* <div className="flex items-center">
@@ -354,8 +350,8 @@ export default function FilterMenu({ params }) {
 
                             {/* Product grid */}
                             <div className="lg:col-span-3">
-                                <div className="bg-white flex flex-col justify-between">  {/* Use flexbox to arrange content */}
-                                    <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 flex-grow">
+                                <div className="bg-white flex flex-col justify-between min-h-full">  {/* Use flexbox to arrange content */}
+                                    <div className="max-w-2xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 flex-grow">
                                         <ProductList
                                             category={category}
                                             categoryTitle={categoryTitle}
@@ -363,6 +359,8 @@ export default function FilterMenu({ params }) {
                                             pageSize={pageSize}
                                             filters={filters}
                                             fetchTotalItemsCount={fetchTotalItemsCount}
+                                            loading={loading}
+                                            setLoading={setLoading}
                                         />
                                     </div>
 

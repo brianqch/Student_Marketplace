@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 export default function ProductCard(props) {
   const router = useRouter();
 
-  console.log(props);
+  // console.log(props);
 
 
   return (

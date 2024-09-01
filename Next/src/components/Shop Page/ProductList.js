@@ -1,17 +1,22 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
+import ProductSkeleton from './ProductSkeleton';
 import supabase from '../../lib/supabase';
-import PreloadProductCard from './PreloadProductCard'
 
-export default function ProductList({ category, categoryTitle, page, pageSize, filters, fetchTotalItemsCount}) {
+export default function ProductList({ category, categoryTitle, page, pageSize, filters, fetchTotalItemsCount, loading, setLoading}) {
     const [items, setItems] = useState([]);
     const [totalItems, setTotalItems] = useState(0);
 
-
     useEffect(() => {
+
+        const MIN_LOADING_TIME = 500;
+        const startLoadingTime = Date.now();
+
+
         const fetchItems = async () => {
             try {
+
                 // Fetch items with a specific category
                 const start = (page - 1) * pageSize;
                 const end = start + pageSize - 1;
@@ -74,56 +79,61 @@ export default function ProductList({ category, categoryTitle, page, pageSize, f
                     query.or(conditionFilter.join(','))
                 }
 
-
-                
                 // Pagination
                 query.range(start, end);
-
 
                 const { data: items, count, itemsError } = await query;
 
                 fetchTotalItemsCount(count)
                 setTotalItems(count)
-                console.log("COUNT", count)
-
 
                 if (itemsError) {
                     console.error('Error fetching items:', itemsError);
                     setItems([]);
                 } else {
-                    // console.log(items[0]);
                     setItems(items);
                 }
 
             } catch (error) {
                 console.error('Error:', error);
                 setItems([]);
+            } finally {
+                const loadingTime = Date.now() - startLoadingTime;
+                const remainingLoadingTime = MIN_LOADING_TIME - loadingTime;
+                console.log(remainingLoadingTime);
+
+                if (remainingLoadingTime > 0) {
+                    setTimeout(() => {
+                        setLoading(false);
+                    }, remainingLoadingTime);
+                } else {
+                    setLoading(false);
+                }
             }
         };
 
         fetchItems();
-    }, [category, page, filters]);
-    
-
+    }, [category, page, filters, pageSize, fetchTotalItemsCount]);
 
     return (
-
-        <div>
+        <div className="flex flex-col">
             <span>
                 {categoryTitle}
                 <span className="text-gray-600"> ({totalItems} items)</span>
             </span>
             <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {items.map((item) => (
-                    <ProductCard
-                        key={item.id}
-                        item={item}
-                    />
-                    // <PreloadProductCard/>
-                ))}
+                {loading ? (
+                    // Display skeletons while loading
+                    [...Array(pageSize)].map((_, index) => (
+                        <ProductSkeleton key={index} />
+                    ))
+                ) : (
+                    // Display actual product cards once loading is complete
+                    items.map((item) => (
+                        <ProductCard key={item.id} item={item} />
+                    ))
+                )}
             </div>
-
         </div>
-
-    )
+    );
 }
