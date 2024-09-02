@@ -100,7 +100,6 @@ export default function ProductList({ category, categoryTitle, page, pageSize, f
             } finally {
                 const loadingTime = Date.now() - startLoadingTime;
                 const remainingLoadingTime = MIN_LOADING_TIME - loadingTime;
-                console.log(remainingLoadingTime);
 
                 if (remainingLoadingTime > 0) {
                     setTimeout(() => {

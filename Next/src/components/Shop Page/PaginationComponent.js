@@ -32,6 +32,7 @@ function PaginationComponent({ totalPages, currentPage, handlePageChange }) {
 
   const pages = generatePageNumbers();
 
+
   if (pages == 0) {
     return;
   }

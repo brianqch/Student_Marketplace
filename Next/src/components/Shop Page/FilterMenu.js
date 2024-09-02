@@ -9,6 +9,7 @@ import {
     Disclosure,
     DisclosureButton,
     DisclosurePanel,
+    Transition,
     Menu,
     MenuButton,
     MenuItem,
@@ -20,6 +21,7 @@ import ProductList from './ProductList';
 import ProductSkeleton from "./ProductSkeleton";
 import supabase from '../../lib/supabase'; // Adjust the path as needed
 import PaginationComponent from "../../components/Shop Page/PaginationComponent";
+import { motion } from "framer-motion";
 
 
 // Filter
@@ -118,11 +120,21 @@ export default function FilterMenu({ params }) {
     };
 
     useEffect(() => {
-        const { count } = supabase
-            .from('items')
-            .select('*', { count: 'exact', head: true });
-        fetchTotalItemsCount(count); // Fetch total count on initial load
+        const fetchData = async () => {
+            const { count, error } = await supabase
+                .from('items')
+                .select('*', { count: 'exact', head: true });
+
+            if (error) {
+                console.error("Error fetching count:", error);
+            } else {
+                fetchTotalItemsCount(count);
+            }
+        };
+
+        fetchData();
     }, []);
+
 
 
 
@@ -312,6 +324,7 @@ export default function FilterMenu({ params }) {
                                 </ul>
 
                                 {filters.map((section) => (
+
                                     <Disclosure key={section.id} as="div" className="border-b border-gray-200 py-6">
                                         <h3 className="-my-3 flow-root">
                                             <DisclosureButton className="group flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
@@ -322,27 +335,36 @@ export default function FilterMenu({ params }) {
                                                 </span>
                                             </DisclosureButton>
                                         </h3>
-                                        <DisclosurePanel className="pt-6">
-                                            <div className="space-y-4">
-                                                {section.options.map((option, optionIdx) => (
-                                                    <div key={option.value} className="flex items-center">
-                                                        <input
-                                                            value={option.value}
-                                                            checked={option.checked}
-                                                            id={`filter-${section.id}-${optionIdx}`}
-                                                            name={`${section.id}[]`}
-                                                            type="checkbox"
-                                                            className="h-4 w-4 border-gray-300 text-uni-blue focus:ring-uni-blue"
-                                                            onChange={() => handleCheckboxChange(section.id, option.value)}
+                                        <Transition
+                                        className="transition-all duration-300 overflow-hidden"
+                                        enterFrom="transform scale-100 opacity-0 max-h-0"
+                                        enterTo="transform scale-100 opacity-100 max-h-[1000px]"
+                                        leaveFrom="transform scale-100 opacity-100 max-h-[1000px]"
+                                        leaveTo="transform scale-100 opacity-0 max-h-0"
+                                        >
+                                            <DisclosurePanel>
+                                                <div className="space-y-4 pt-6">
+                                                    {section.options.map((option, optionIdx) => (
+                                                        <div key={option.value} className="flex items-center">
+                                                            <input
+                                                                value={option.value}
+                                                                checked={option.checked}
+                                                                id={`filter-${section.id}-${optionIdx}`}
+                                                                name={`${section.id}[]`}
+                                                                type="checkbox"
+                                                                className="h-4 w-4 border-gray-300 text-uni-blue focus:ring-uni-blue"
+                                                                onChange={() => handleCheckboxChange(section.id, option.value)}
 
-                                                        />
-                                                        <label htmlFor={`filter-${section.id}-${optionIdx}`} className="ml-3 text-sm text-gray-600">
-                                                            {option.label}
-                                                        </label>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </DisclosurePanel>
+                                                            />
+                                                            <label htmlFor={`filter-${section.id}-${optionIdx}`} className="ml-3 text-sm text-gray-600">
+                                                                {option.label}
+                                                            </label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                            </DisclosurePanel>
+                                        </Transition>
                                     </Disclosure>
                                 ))}
                             </form>
@@ -362,15 +384,14 @@ export default function FilterMenu({ params }) {
                                             loading={loading}
                                             setLoading={setLoading}
                                         />
-                                    </div>
-
-                                    {/* Pagination */}
-                                    <div className="flex justify-end mr-8">  
-                                        <PaginationComponent
-                                            totalPages={totalPages}
-                                            currentPage={page}
-                                            handlePageChange={handlePageChange}
-                                        />
+                                        {/* Pagination */}
+                                        <div className="flex justify-end">
+                                            <PaginationComponent
+                                                totalPages={totalPages}
+                                                currentPage={page}
+                                                handlePageChange={handlePageChange}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
