@@ -99,7 +99,7 @@ export default function SearchBar({ initialProducts = [] }) {
     };
 
     return (
-        <div ref={ref} className="relative w-full white flex items-center justify-between px-6 rounded-full">
+        <div ref={ref} className="relative w-full white flex items-center justify-between px-3 sm:px-6 rounded-full">
             <div className="flex-1 rounded-full relative border-2 border-gray-200 transition-colors duration-300 ease-in-out focus-within:border-[#0064fa]">
                 <input
                     className="w-full outline-0 placeholder:text-[#C4C4C4] placeholder:text-[14px] bg-transparent focus:ring-0 border-0"

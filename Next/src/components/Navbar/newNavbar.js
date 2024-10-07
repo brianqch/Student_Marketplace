@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { IoPersonOutline } from "react-icons/io5";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import { GoBell } from "react-icons/go";
+import Popover from "@mui/material/Popover";
 import SearchBar from './SearchBar';
 import Modal from './Modal'; // Import a modal component
 
@@ -13,6 +14,7 @@ export default function NewNavbar() {
   const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
+  const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -80,11 +82,22 @@ export default function NewNavbar() {
     handleOAuthCallback();
   }, [router]);
 
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
   return (
-    <nav className="relative px-14 z-40">
-      <div className="flex justify-between h-16 items-center px-10 rounded-full border-2 border-gray-200 bg-white bg-opacity-50">
+    <nav className="relative sm:px-14 z-40">
+      <div className="flex justify-between h-16 items-center px-6 sm:px-10 rounded-full border-2 border-gray-200 bg-white bg-opacity-50">
         {/* Left */}
-        <div className="flex items-center space-x-2 max-w-3xl w-full">
+        <div className="flex items-center sm:space-x-2 max-w-3xl w-full">
           <h1
             className="font-rammetto text-2xl text-uni-blue font-bold cursor-pointer"
             onClick={handleRedirectToDashboard}
@@ -104,7 +117,7 @@ export default function NewNavbar() {
               <Link href="/cart">
                 <AiOutlineShoppingCart className="h-7 w-7" />
               </Link>
-              <Link href="/profile">
+              <Link href={`/profile/${user.id}`}>
                 <IoPersonOutline className="h-7 w-7" />
               </Link>
               {/* Divider */}

@@ -92,7 +92,7 @@ const ViewItem = ({ params }) => {
                     // Fetch user information
                     const { data: user, error: userError } = await supabase
                         .from('users')
-                        .select('name')
+                        .select('name, usertag')
                         .eq('id', item.user_id)
                         .single();
                 
@@ -181,7 +181,7 @@ const ViewItem = ({ params }) => {
                                         </img>
                                         <div className="flex flex-col overflow-hidden">
                                             <span className="text-sm">{seller.name}</span>
-                                            <span className="text-xs">Usertag</span>
+                                            <span className="text-xs">@{seller.usertag}</span>
                                         </div>
                                     </div>
                                     {/* Rating */}
