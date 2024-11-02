@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import supabase from "../../../lib/supabase";
 import ProductCard from "../../../components/Shop Page/ProductCard";
+import CreateProductCard from "../../../components/Shop Page/CreateProductCard";
 
 export default function Profile({ params }) {
     const [userData, setUserData] = useState();
@@ -144,6 +145,7 @@ export default function Profile({ params }) {
 
                             {index == 0 ? (
                                 <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                    <CreateProductCard/>
                                     {loading
                                         ? // Display skeletons while loading
                                         [...Array(5)].map((_, index) => (

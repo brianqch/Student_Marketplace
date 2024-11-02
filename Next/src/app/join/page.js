@@ -1,12 +1,18 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
-import Onboarding1 from "../../components/Onboarding/Onboarding1";
-import Onboarding2 from "../../components/Onboarding/Onboarding2";
-import Onboarding3 from "../../components/Onboarding/Onboarding3";
-import Onboarding4 from "../../components/Onboarding/Onboarding4";
+import dynamic from 'next/dynamic'
+import { motion } from 'framer-motion';
+// import Onboarding1 from "../../components/Onboarding/Onboarding1";
+// import Onboarding2 from "../../components/Onboarding/Onboarding2";
+// import Onboarding3 from "../../components/Onboarding/Onboarding3";
+// import Onboarding4 from "../../components/Onboarding/Onboarding4";
 import ProgressBar from "../../components/Onboarding/ProgressBar";
+
+const LazyOnboarding1 = dynamic(() => import('../../components/Onboarding/Onboarding1'));
+const LazyOnboarding2 = dynamic(() => import('../../components/Onboarding/Onboarding2'));
+const LazyOnboarding3 = dynamic(() => import('../../components/Onboarding/Onboarding3'));
+const LazyOnboarding4 = dynamic(() => import('../../components/Onboarding/Onboarding4'));
 
 const variants = {
     initial: (direction) => ({
@@ -69,10 +75,10 @@ export default function JoinPage() {
 
     // Array of onboarding components
     const onboardingComponents = [
-        <Onboarding1 key="onboarding1" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} error={error} setError={setError} activeButton={activeButton} setActiveButton={setActiveButton}/>,
-        <Onboarding2 key="onboarding2" step={step} setStep={setStep} firstName={firstName} school={school} setSchool={setSchool} error={error} setError={setError} handlePrevious={handlePrevious} />,
-        <Onboarding3 key="onboarding3" step={step} setStep={setStep} school={school} area={area} setArea={setArea} error={error} setError={setError} handlePrevious={handlePrevious}/>,
-        <Onboarding4 key="onboarding4" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} lastName={lastName} setLastName={setLastName} error={error} setError={setError} email={email} setEmail={setEmail} password={password} setPassword={setPassword} handlePrevious={handlePrevious}/>,
+        <LazyOnboarding1 key="onboarding1" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} error={error} setError={setError} activeButton={activeButton} setActiveButton={setActiveButton}/>,
+        <LazyOnboarding2 key="onboarding2" step={step} setStep={setStep} firstName={firstName} school={school} setSchool={setSchool} error={error} setError={setError} handlePrevious={handlePrevious} />,
+        <LazyOnboarding3 key="onboarding3" step={step} setStep={setStep} school={school} area={area} setArea={setArea} error={error} setError={setError} handlePrevious={handlePrevious}/>,
+        <LazyOnboarding4 key="onboarding4" step={step} setStep={setStep} firstName={firstName} setFirstName={setFirstName} lastName={lastName} setLastName={setLastName} error={error} setError={setError} email={email} setEmail={setEmail} password={password} setPassword={setPassword} handlePrevious={handlePrevious}/>,
     ];
 
     return (
@@ -89,7 +95,6 @@ export default function JoinPage() {
             >
                 {onboardingComponents[step]}
             </motion.div>
-            {/* <div className="absolute bottom-20 w-[80%]"> */}
             <div className="w-full sm:w-[80%] h-[10%]">
                 <ProgressBar step={step} setStep={setStep} handleNext={handleNext} handlePrevious={handlePrevious} error={error} setError={setError} />
             </div>
