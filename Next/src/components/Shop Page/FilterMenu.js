@@ -26,11 +26,10 @@ import { motion } from "framer-motion";
 
 // Filter
 const sortOptions = [
-    { name: 'Most Popular', href: '#', current: true },
-    { name: 'Best Rating', href: '#', current: false },
-    { name: 'Newest', href: '#', current: false },
-    { name: 'Price: Low to High', href: '#', current: false },
-    { name: 'Price: High to Low', href: '#', current: false },
+    { name: 'Newest', type: {column: 'created_at', ascending: true}, current: false },
+    { name: 'Oldest', type: {column: 'created_at', ascending: false}, current: false },
+    { name: 'Price: Low to High', type: {column: 'price', ascending: true}, current: false },
+    { name: 'Price: High to Low', type: {column: 'price', ascending: false}, current: false },
 ]
 const subCategories = [
     { name: 'All', href: '/shop' },
@@ -100,8 +99,8 @@ export default function FilterMenu({ params }) {
     ]);
 
 
-    const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
-    const [items, setItems] = useState([]);
+    const [mobileFiltersOpen, setMobileFiltersOpen] = useState(true)
+    const [sortBy, setSortBy] = useState(null);
     const category = params ? params.category : '';
     const upperCaseCategory = (category).charAt(0).toUpperCase() + (category).slice(1);
     const categoryTitle = category ? upperCaseCategory : "All Products";
@@ -168,6 +167,10 @@ export default function FilterMenu({ params }) {
         );
     };
 
+    const handleSortBy = (optionType) => {
+        setSortBy(optionType);
+    };
+
     return (
         <div className='z-15'>
             <div>
@@ -194,8 +197,6 @@ export default function FilterMenu({ params }) {
                                     <XMarkIcon aria-hidden="true" className="h-6 w-6" />
                                 </button>
                             </div>
-
-                            {/* Filters */}
                             <form className="mt-4 border-t border-gray-200">
                                 <h3 className="sr-only">Categories</h3>
                                 <ul role="list" className="px-2 py-3 font-medium text-gray-900">
@@ -256,7 +257,7 @@ export default function FilterMenu({ params }) {
                     <div className="flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24 min-h-full">
                         <h1 className="text-4xl font-bold tracking-tight text-gray-900">New Arrivals</h1>
 
-                        {/* <div className="flex items-center">
+                        <div className="flex items-center">
                             <Menu as="div" className="relative inline-block text-left z-30">
                                 <div>
                                     <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
@@ -276,11 +277,11 @@ export default function FilterMenu({ params }) {
                                         {sortOptions.map((option) => (
                                             <MenuItem key={option.name}>
                                                 <a
-                                                    href={option.href}
                                                     className={classNames(
                                                         option.current ? 'font-medium text-gray-900' : 'text-gray-500',
                                                         'block px-4 py-2 text-sm data-[focus]:bg-gray-100',
                                                     )}
+                                                    onClick={() => handleSortBy(option.type)}
                                                 >
                                                     {option.name}
                                                 </a>
@@ -290,10 +291,10 @@ export default function FilterMenu({ params }) {
                                 </MenuItems>
                             </Menu>
 
-                            <button type="button" className="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
+                            {/* <button type="button" className="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
                                 <span className="sr-only">View grid</span>
                                 <Squares2X2Icon aria-hidden="true" className="h-5 w-5" />
-                            </button>
+                            </button> */}
                             <button
                                 type="button"
                                 onClick={() => setMobileFiltersOpen(true)}
@@ -302,7 +303,7 @@ export default function FilterMenu({ params }) {
                                 <span className="sr-only">Filters</span>
                                 <FunnelIcon aria-hidden="true" className="h-5 w-5" />
                             </button>
-                        </div> */}
+                        </div>
                     </div>
 
                     <section aria-labelledby="products-heading" className="pb-24 pt-6">
@@ -383,6 +384,7 @@ export default function FilterMenu({ params }) {
                                             fetchTotalItemsCount={fetchTotalItemsCount}
                                             loading={loading}
                                             setLoading={setLoading}
+                                            sortBy={sortBy}
                                         />
                                         {/* Pagination */}
                                         <div className="flex justify-end">

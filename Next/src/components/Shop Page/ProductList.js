@@ -4,7 +4,7 @@ import ProductCard from './ProductCard';
 import ProductSkeleton from './ProductSkeleton';
 import supabase from '../../lib/supabase';
 
-export default function ProductList({ category, categoryTitle, page, pageSize, filters, fetchTotalItemsCount, loading, setLoading}) {
+export default function ProductList({ category, categoryTitle, page, pageSize, filters, fetchTotalItemsCount, loading, setLoading, sortBy}) {
     const [items, setItems] = useState([]);
     const [totalItems, setTotalItems] = useState(0);
 
@@ -20,6 +20,7 @@ export default function ProductList({ category, categoryTitle, page, pageSize, f
                 // Fetch items with a specific category
                 const start = (page - 1) * pageSize;
                 const end = start + pageSize - 1;
+
 
                 let query = supabase
                 .from('items')
@@ -41,6 +42,10 @@ export default function ProductList({ category, categoryTitle, page, pageSize, f
                 // Filter by category
                 if (category) {
                     query.ilike('category', `%${category}%`);
+                }
+
+                if (sortBy) {
+                    query.order(sortBy.column, {ascending: sortBy.ascending})
                 }
 
                 // Filter by price 
